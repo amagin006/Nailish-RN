@@ -1,22 +1,62 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable react/display-name */
 import React from 'react';
-import { View, Text } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { Foundation, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import Splash from './Splash';
-import CustomerListHome from './screens/CustomerList/CustmerListHome';
+import CustomerListHome from './screens/CustomerList/CustomerListHome';
 import CalenderHome from './screens/Calender/CalenderHome';
 import Login from './screens/Login/Login';
 import SignUp from './screens/Login/SignUp';
 
+const CustomerListStack = createStackNavigator(
+  {
+    CustomerListHome: {
+      screen: CustomerListHome,
+    },
+  },
+  {
+    initialRouteName: 'CustomerListHome',
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: '#D9534F',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    },
+  },
+);
+
+const CalenderStack = createStackNavigator(
+  {
+    CalenderHome: {
+      screen: CalenderHome,
+    },
+  },
+  {
+    initialRouteName: 'CalenderHome',
+    defaultNavigationOptions: () => ({
+      headerStyle: {
+        backgroundColor: '#D9534F',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    }),
+  },
+);
+
 const LoginRoute = {
   Login: {
-    name: 'Login',
     screen: Login,
   },
   SignUp: {
-    name: 'SignUp',
     screen: SignUp,
   },
 };
@@ -27,26 +67,35 @@ const LoginSignupNavigator = createStackNavigator(LoginRoute, {
 });
 
 const BottomTabRoutes = {
-  CustomerListHome: {
-    name: 'CustomerListHome',
-    screen: CustomerListHome,
+  CustomerListStack: {
+    screen: CustomerListStack,
     navigationOptions: {
       title: 'Customer',
+      tabBarIcon: ({ tintColor }) => (
+        <Foundation style={{ marginTop: 4, color: tintColor }} name="torsos-all" size={28} />
+      ),
     },
   },
-  CalenderHome: {
-    name: 'CalenderHome',
-    screen: CalenderHome,
+  CalenderStack: {
+    screen: CalenderStack,
     navigationOptions: {
       title: 'Calender',
+      tabBarIcon: ({ tintColor }) => (
+        <MaterialCommunityIcons
+          name="calendar-clock"
+          style={{ marginTop: 4, color: tintColor }}
+          size={24}
+          color="gray"
+        />
+      ),
     },
   },
 };
 
 const BottomTabNavigator = createBottomTabNavigator(BottomTabRoutes, {
-  initialRouteName: 'CustomerListHome',
+  initialRouteName: 'CustomerListStack',
   tabBarOptions: {
-    color: '#85b4ff',
+    activeTintColor: '#eb6e3d',
   },
 });
 
