@@ -1,14 +1,15 @@
+/* eslint-disable react/display-name */
 import React from 'react';
 import { SectionList, View, TouchableOpacity, Image, Text, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
 
-const navigationOptions = {
-  headerTitle: 'Customer',
-};
-
 const _renderItem = ({ item }) => {
+  const _onPress = () => {
+    console.log('item', item);
+  };
+
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={_onPress}>
       <Image source={{ uri: `${item.userIcon}` }} style={styles.userIcon} />
       <View style={styles.customerInfo}>
         <Text style={styles.name}>{`${item.firstName} ${item.lastName}`}</Text>
@@ -26,16 +27,15 @@ const _renderSectionHeader = ({ section: data }) => {
   );
 };
 
-const _itemSeparator = () => <View style={styles.separator} />;
-
 const CustomerListHome = () => {
-  CustomerListHome.navigationOptions = navigationOptions;
+  const _itemSeparator = () => <View style={styles.separator} />;
+  const _keyExtractor = item => item.id;
 
   return (
     <View style={styles.sectionList}>
       <SectionList
         sections={DATA}
-        keyExtractor={item => item.id}
+        keyExtractor={_keyExtractor}
         renderSectionHeader={_renderSectionHeader}
         renderItem={_renderItem}
         ItemSeparatorComponent={_itemSeparator}
@@ -43,6 +43,13 @@ const CustomerListHome = () => {
     </View>
   );
 };
+
+CustomerListHome.navigationOptions = () => ({
+  title: 'Customer',
+  headerRight: () => <Text>Hello</Text>,
+});
+_renderItem.propTypes = { item: PropTypes.object.isRequired };
+_renderSectionHeader.propTypes = { section: PropTypes.object.isRequired };
 
 const styles = StyleSheet.create({
   sectionList: {
