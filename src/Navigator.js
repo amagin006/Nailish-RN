@@ -8,6 +8,7 @@ import { Foundation, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import Splash from './Splash';
 import CustomerListHome from './screens/CustomerList/CustomerListHome';
+import CustomerReport from './screens/CustomerList/CustomerReport';
 import CalenderHome from './screens/Calender/CalenderHome';
 import Login from './screens/Login/Login';
 import SignUp from './screens/Login/SignUp';
@@ -16,6 +17,9 @@ const CustomerListStack = createStackNavigator(
   {
     CustomerListHome: {
       screen: CustomerListHome,
+    },
+    CustomerReport: {
+      screen: CustomerReport,
     },
   },
   {
@@ -83,7 +87,7 @@ const BottomTabRoutes = {
       tabBarIcon: ({ tintColor }) => (
         <MaterialCommunityIcons
           name="calendar-clock"
-          style={{ marginTop: 4, color: tintColor }}
+          style={{ marginTop: 8, color: tintColor }}
           size={24}
           color="gray"
         />
