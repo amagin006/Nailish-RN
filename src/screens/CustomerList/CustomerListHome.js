@@ -45,7 +45,7 @@ const CustomerListHome = ({ navigation }) => {
   };
 
   const _onAddButton = () => {
-    console.log('onAddButton');
+    navigation.navigate('CustomerEdit');
   };
 
   return (

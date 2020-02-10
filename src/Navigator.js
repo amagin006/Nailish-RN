@@ -9,6 +9,7 @@ import { Foundation, MaterialCommunityIcons } from '@expo/vector-icons';
 import Splash from './Splash';
 import CustomerListHome from './screens/CustomerList/CustomerListHome';
 import CustomerReport from './screens/CustomerList/CustomerReport';
+import CustomerEdit from './screens/CustomerList/CustomerEdit';
 import CalenderHome from './screens/Calender/CalenderHome';
 import Login from './screens/Login/Login';
 import SignUp from './screens/Login/SignUp';
@@ -20,6 +21,9 @@ const CustomerListStack = createStackNavigator(
     },
     CustomerReport: {
       screen: CustomerReport,
+    },
+    CustomerEdit: {
+      screen: CustomerEdit,
     },
   },
   {
