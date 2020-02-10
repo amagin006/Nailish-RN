@@ -1,5 +1,14 @@
 import React from 'react';
-import { View, Image, StyleSheet, Text, SafeAreaView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  Text,
+  SafeAreaView,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
+import moment from 'moment';
 import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 
@@ -12,8 +21,31 @@ const CusomerReport = ({ navigation }) => {
     console.log('_onAddNewReport');
   };
 
-  return (
-    <SafeAreaView>
+  const _keyExtractor = item => {
+    return item.id;
+  };
+
+  const _onPressCard = item => {
+    console.log('onPressCard', item);
+  };
+
+  const _renderItem = item => {
+    const date = moment(item.item.appointmentStart).format('YYYY/MM/DD');
+    const startTime = moment(item.item.appointmentStart).format('HH:mm');
+    const endTime = moment(item.item.appointmentEnd).format('HH:mm');
+    return (
+      <TouchableOpacity onPress={() => _onPressCard(item)} style={styles.reportCardWrapper}>
+        <Image style={styles.cardImage} source={{ uri: `${item.item.photo[0].url}` }} />
+        <View style={styles.textWrapper}>
+          <Text style={styles.dateText}>{date}</Text>
+          <Text style={styles.timeText}>{`${startTime} ~ ${endTime}`}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const _listHeader = () => {
+    return (
       <View style={styles.customerInfoBox}>
         <View style={styles.customerIconWrapper}>
           <Image source={{ uri: `${user.userIcon}` }} style={styles.customerIcon} />
@@ -33,6 +65,18 @@ const CusomerReport = ({ navigation }) => {
           <Text style={styles.newReportText}>New Report</Text>
         </TouchableOpacity>
       </View>
+    );
+  };
+
+  return (
+    <SafeAreaView>
+      <FlatList
+        data={FAKE_DATA}
+        keyExtractor={_keyExtractor}
+        ListHeaderComponent={_listHeader}
+        ListHeaderComponentStyle={styles.listHeader}
+        renderItem={_renderItem}
+      />
     </SafeAreaView>
   );
 };
@@ -103,14 +147,43 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#fff',
   },
+  listHeader: {
+    marginBottom: 20,
+  },
+  reportCardWrapper: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8ED',
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+  },
+  cardImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 6,
+  },
+  textWrapper: {
+    marginLeft: 18,
+    marginRight: 10,
+  },
+  dateText: {
+    fontSize: 19,
+    color: '#2b2b2b',
+  },
+  timeText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#828282',
+  },
 });
 
 export default CusomerReport;
-
-const fakeData = [
+const FAKE_DATA = [
   {
-    appointmentStart: new Date('2019-02-08 12:00:00'),
-    appointmentEnd: new Date('2019-02-08 16:00:00'),
+    id: '1',
+    appointmentStart: '2020-02-08 12:00',
+    appointmentEnd: '2020-02-08 14:00',
     photo: [
       { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
       { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
@@ -124,11 +197,12 @@ const fakeData = [
     ],
   },
   {
-    appointmentStart: new Date('2019-02-08 12:00:00'),
-    appointmentEnd: new Date('2019-02-08 16:00:00'),
+    id: '2',
+    appointmentStart: '2020-02-23 18:00',
+    appointmentEnd: '2020-02-23 20:00',
     photo: [
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
       { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
+      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
       { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
       { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
     ],
@@ -139,8 +213,9 @@ const fakeData = [
     ],
   },
   {
-    appointmentStart: new Date('2019-02-08 12:00:00'),
-    appointmentEnd: new Date('2019-02-08 16:00:00'),
+    id: '3',
+    appointmentStart: '2020-03-08 12:00',
+    appointmentEnd: '2020-03-08 18:00',
     photo: [
       { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
       { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
