@@ -5,7 +5,8 @@ import { Foundation } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import PropTypes from 'prop-types';
 
-const CustomerEdit = ({ navigation }) => {
+const CustomerEdit = props => {
+  const { navigation } = props;
   const [firstName, setFirstName] = useState();
   const [lastName, setLastName] = useState();
   const [mobile, setMobile] = useState();
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
   columnLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '40%',
+    width: 170,
     paddingHorizontal: '4%',
   },
   columnIcon: {

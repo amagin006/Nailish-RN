@@ -13,6 +13,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 
 import SnsButtons from '../../components/snsButton/snsButtons';
+import { apisAreAvailable } from 'expo';
 
 const CusomerReport = ({ navigation }) => {
   const user = navigation.state.params;
@@ -25,8 +26,9 @@ const CusomerReport = ({ navigation }) => {
     return item.id;
   };
 
-  const _onPressCard = item => {
-    console.log('onPressCard', item);
+  const _onPressCard = (user, item) => {
+    // console.log('onPressCard', item);
+    navigation.navigate('ReportDetail', { user, item });
   };
 
   const _renderItem = item => {
@@ -34,7 +36,9 @@ const CusomerReport = ({ navigation }) => {
     const startTime = moment(item.item.appointmentStart).format('HH:mm');
     const endTime = moment(item.item.appointmentEnd).format('HH:mm');
     return (
-      <TouchableOpacity onPress={() => _onPressCard(item)} style={styles.reportCardWrapper}>
+      <TouchableOpacity
+        onPress={() => _onPressCard(FAKE_DATA.user, item)}
+        style={styles.reportCardWrapper}>
         <Image style={styles.cardImage} source={{ uri: `${item.item.photo[0].url}` }} />
         <View style={styles.textWrapper}>
           <Text style={styles.dateText}>{date}</Text>
@@ -71,7 +75,7 @@ const CusomerReport = ({ navigation }) => {
   return (
     <SafeAreaView>
       <FlatList
-        data={FAKE_DATA}
+        data={FAKE_DATA.report}
         keyExtractor={_keyExtractor}
         ListHeaderComponent={_listHeader}
         ListHeaderComponentStyle={styles.listHeader}
@@ -179,53 +183,99 @@ const styles = StyleSheet.create({
 });
 
 export default CusomerReport;
-const FAKE_DATA = [
-  {
-    id: '1',
-    appointmentStart: '2020-02-08 12:00',
-    appointmentEnd: '2020-02-08 14:00',
-    photo: [
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
-    ],
-    menu: [
-      { menuItem: 'jel', price: '20', bgcolor: '#FF9F9F' },
-      { menuItem: 'off', price: '30', bgcolor: '#FF9F9F' },
-      { menuItem: 'Design', price: '40', bgcolor: '#FF9F9F' },
-    ],
+const FAKE_DATA = {
+  user: {
+    id: 1,
+    firstName: 'Assuly',
+    lastName: 'Henry',
+    userIcon: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/01.jpg',
+    lastVisit: '2020/01/02',
+    nameInitial: 'A',
   },
-  {
-    id: '2',
-    appointmentStart: '2020-02-23 18:00',
-    appointmentEnd: '2020-02-23 20:00',
-    photo: [
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
-    ],
-    menu: [
-      { menuItem: 'jel', price: '20', bgcolor: '#FF9F9F' },
-      { menuItem: 'off', price: '30', bgcolor: '#FF9F9F' },
-      { menuItem: 'Design', price: '40', bgcolor: '#FF9F9F' },
-    ],
-  },
-  {
-    id: '3',
-    appointmentStart: '2020-03-08 12:00',
-    appointmentEnd: '2020-03-08 18:00',
-    photo: [
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg' },
-      { url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg' },
-    ],
-    menu: [
-      { menuItem: 'jel', price: '20', bgcolor: '#FF9F9F' },
-      { menuItem: 'off', price: '30', bgcolor: '#FF9F9F' },
-      { menuItem: 'Design', price: '40', bgcolor: '#FF9F9F' },
-    ],
-  },
-];
+  report: [
+    {
+      id: '1',
+      appointmentStart: '2020-02-08 12:00',
+      appointmentEnd: '2020-02-08 14:00',
+      photo: [
+        {
+          id: 'aaa',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg',
+        },
+        {
+          id: 'aab',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg',
+        },
+        {
+          id: 'aac',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg',
+        },
+        {
+          id: 'aad',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg',
+        },
+      ],
+      menu: [
+        { menuItem: 'jel', price: '20', bgcolor: '#FF9F9F' },
+        { menuItem: 'off', price: '30', bgcolor: '#FF9F9F' },
+        { menuItem: 'Design', price: '40', bgcolor: '#FF9F9F' },
+      ],
+    },
+    {
+      id: '2',
+      appointmentStart: '2020-02-23 18:00',
+      appointmentEnd: '2020-02-23 20:00',
+      photo: [
+        {
+          id: 'aba',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg',
+        },
+        {
+          id: 'abb',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg',
+        },
+        {
+          id: 'abc',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg',
+        },
+        {
+          id: 'abd',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg',
+        },
+      ],
+      menu: [
+        { menuItem: 'jel', price: '20', bgcolor: '#FF9F9F' },
+        { menuItem: 'off', price: '30', bgcolor: '#FF9F9F' },
+        { menuItem: 'Design', price: '40', bgcolor: '#FF9F9F' },
+      ],
+    },
+    {
+      id: '3',
+      appointmentStart: '2020-03-08 12:00',
+      appointmentEnd: '2020-03-08 18:00',
+      photo: [
+        {
+          id: 'aca',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg',
+        },
+        {
+          id: 'acb',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg',
+        },
+        {
+          id: 'acc',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample1.jpg',
+        },
+        {
+          id: 'acd',
+          url: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/nailsample2.jpg',
+        },
+      ],
+      menu: [
+        { menuItem: 'jel', price: '20', bgcolor: '#FF9F9F' },
+        { menuItem: 'off', price: '30', bgcolor: '#FF9F9F' },
+        { menuItem: 'Design', price: '40', bgcolor: '#FF9F9F' },
+      ],
+    },
+  ],
+};
