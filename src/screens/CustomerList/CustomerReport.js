@@ -13,7 +13,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 
 import SnsButtons from '../../components/snsButton/snsButtons';
-import { apisAreAvailable } from 'expo';
 
 const CusomerReport = ({ navigation }) => {
   const user = navigation.state.params;
@@ -163,8 +162,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   cardImage: {
-    width: 70,
-    height: 70,
+    width: 55,
+    height: 55,
     borderRadius: 6,
   },
   textWrapper: {
@@ -216,9 +215,13 @@ const FAKE_DATA = {
         },
       ],
       menu: [
-        { menuItem: 'jel', price: '20', bgcolor: '#FF9F9F' },
-        { menuItem: 'off', price: '30', bgcolor: '#FF9F9F' },
-        { menuItem: 'Design', price: '40', bgcolor: '#FF9F9F' },
+        {
+          menuItem: 'jeldsffsdkfdkkjsdkjsjkjlkkljkljkljkljlkjlkjlkjkl',
+          price: '20',
+          bgcolor: '#FF9F9F',
+        },
+        { menuItem: 'off', price: '30', bgcolor: '#87D1AA' },
+        { menuItem: 'Design', price: '40', bgcolor: '#AC71D1' },
       ],
     },
     {
@@ -245,8 +248,8 @@ const FAKE_DATA = {
       ],
       menu: [
         { menuItem: 'jel', price: '20', bgcolor: '#FF9F9F' },
-        { menuItem: 'off', price: '30', bgcolor: '#FF9F9F' },
-        { menuItem: 'Design', price: '40', bgcolor: '#FF9F9F' },
+        { menuItem: 'off', price: '30', bgcolor: '#87D1AA' },
+        { menuItem: 'Design', price: '40', bgcolor: '#AC71D1' },
       ],
     },
     {
@@ -273,8 +276,8 @@ const FAKE_DATA = {
       ],
       menu: [
         { menuItem: 'jel', price: '20', bgcolor: '#FF9F9F' },
-        { menuItem: 'off', price: '30', bgcolor: '#FF9F9F' },
-        { menuItem: 'Design', price: '40', bgcolor: '#FF9F9F' },
+        { menuItem: 'off', price: '30', bgcolor: '#87D1AA' },
+        { menuItem: 'Design', price: '40', bgcolor: '#AC71D1' },
       ],
     },
   ],

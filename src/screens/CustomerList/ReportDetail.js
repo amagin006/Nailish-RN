@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, Image, FlatList, StyleSheet, Dimensions } from 'react-native';
-
+import PropTypes from 'prop-types';
 import moment from 'moment';
+
+import PagenationDot from '../../components/pagenation/pagenationDot';
+import ReportMenuList from '../../components/menu/reportMenuList';
 
 const ReportDetail = ({ navigation }) => {
   const { user, item } = navigation.state.params;
@@ -9,9 +12,15 @@ const ReportDetail = ({ navigation }) => {
   const startTime = moment(item.item.appointmentStart).format('HH:mm');
   const endTime = moment(item.item.appointmentEnd).format('HH:mm');
 
-  const _renderPhoto = item => <Image source={{ uri: `${item.item.url}` }} style={styles.photo} />;
-  const _keyExtractor = item => item.id;
+  const [viewableItemIndex, setViewableItemIndex] = useState(0);
 
+  const _renderPhoto = item => <Image source={{ uri: `${item.item.url}` }} style={styles.photo} />;
+  const _keyExtractor = item => `${item.id}`;
+
+  const onViewRef = React.useRef(({ viewableItems }) => {
+    setViewableItemIndex(viewableItems[0].index);
+  });
+  const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 });
   return (
     <ScrollView>
       <View style={styles.userWrapper}>
@@ -21,17 +30,27 @@ const ReportDetail = ({ navigation }) => {
           <Text style={styles.date}>{`${date} ${startTime} ~ ${endTime}`}</Text>
         </View>
       </View>
-      <View>
-        <FlatList
-          data={item.item.photo}
-          horizontal={true}
-          renderItem={_renderPhoto}
-          keyExtractor={_keyExtractor}
-        />
-      </View>
+      <FlatList
+        data={item.item.photo}
+        horizontal={true}
+        renderItem={_renderPhoto}
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={_keyExtractor}
+        onViewableItemsChanged={onViewRef.current}
+        viewabilityConfig={viewConfigRef.current}
+      />
+      <PagenationDot
+        style={styles.pagenationDotStyle}
+        foucsItemIndex={viewableItemIndex}
+        list={item.item.photo}
+      />
+      <ReportMenuList menuList={item.item.menu} />
     </ScrollView>
   );
 };
+
+ReportDetail.propTypes = { navigation: PropTypes.object };
 
 const width = Dimensions.get('screen').width;
 
@@ -59,6 +78,9 @@ const styles = StyleSheet.create({
   photo: {
     width: width,
     height: width,
+  },
+  pagenationDotStyle: {
+    marginVertical: 20,
   },
 });
 
