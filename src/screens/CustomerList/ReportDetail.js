@@ -3,8 +3,11 @@ import { View, Text, ScrollView, Image, FlatList, StyleSheet, Dimensions } from 
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
+import commonStyles from '../../components/styles/commonStyles';
 import PagenationDot from '../../components/pagenation/pagenationDot';
-import ReportMenuList from '../../components/menu/reportMenuList';
+import ReportMenuList from '../../components/reportDetail/reportMenuList';
+import PriceDetail from '../../components/reportDetail/priceDetail';
+import Button from '../../components/button/button';
 
 const ReportDetail = ({ navigation }) => {
   const { user, item } = navigation.state.params;
@@ -17,10 +20,15 @@ const ReportDetail = ({ navigation }) => {
   const _renderPhoto = item => <Image source={{ uri: `${item.item.url}` }} style={styles.photo} />;
   const _keyExtractor = item => `${item.id}`;
 
+  const _onDeletePress = () => {
+    console.log('========+++++++========');
+  };
+
   const onViewRef = React.useRef(({ viewableItems }) => {
     setViewableItemIndex(viewableItems[0].index);
   });
   const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 });
+
   return (
     <ScrollView>
       <View style={styles.userWrapper}>
@@ -45,7 +53,11 @@ const ReportDetail = ({ navigation }) => {
         foucsItemIndex={viewableItemIndex}
         list={item.item.photo}
       />
-      <ReportMenuList menuList={item.item.menu} />
+      <View style={commonStyles.bodyWrapper}>
+        <ReportMenuList menuList={item.item.menu} />
+        <PriceDetail menuList={item.item.menu} />
+        <Button onPress={_onDeletePress} text="delete" deleteButton={true} style={styles.button} />
+      </View>
     </ScrollView>
   );
 };
@@ -81,6 +93,9 @@ const styles = StyleSheet.create({
   },
   pagenationDotStyle: {
     marginVertical: 20,
+  },
+  button: {
+    marginVertical: 30,
   },
 });
 
