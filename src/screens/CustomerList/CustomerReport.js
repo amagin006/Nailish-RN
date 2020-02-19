@@ -19,11 +19,10 @@ const CusomerReport = ({ navigation }) => {
 
   const _onAddNewReport = () => {
     console.log('_onAddNewReport');
+    navigation.navigate('ReportEdit');
   };
 
-  const _keyExtractor = item => {
-    return item.id;
-  };
+  const _keyExtractor = item => item.id;
 
   const _onPressCard = (user, item) => {
     // console.log('onPressCard', item);

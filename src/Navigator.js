@@ -11,6 +11,7 @@ import CustomerListHome from './screens/CustomerList/CustomerListHome';
 import CustomerReport from './screens/CustomerList/CustomerReport';
 import CustomerEdit from './screens/CustomerList/CustomerEdit';
 import ReportDetail from './screens/CustomerList/ReportDetail';
+import ReportEdit from './screens/CustomerList/ReportEdit';
 import CalenderHome from './screens/Calender/CalenderHome';
 import Login from './screens/Login/Login';
 import SignUp from './screens/Login/SignUp';
@@ -28,6 +29,9 @@ const CustomerListStack = createStackNavigator(
     },
     ReportDetail: {
       screen: ReportDetail,
+    },
+    ReportEdit: {
+      screen: ReportEdit,
     },
   },
   {

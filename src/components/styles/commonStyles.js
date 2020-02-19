@@ -9,7 +9,7 @@ export default {
   },
   leftColumn: {
     fontSize: 18,
-    width: '25%',
+    width: '28%',
     color: '#9c9c9c',
   },
   rightColumn: {

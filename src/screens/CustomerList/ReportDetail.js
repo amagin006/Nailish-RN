@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Image, FlatList, StyleSheet, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  SafeAreaView,
+  Image,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
@@ -30,35 +39,42 @@ const ReportDetail = ({ navigation }) => {
   const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 });
 
   return (
-    <ScrollView>
-      <View style={styles.userWrapper}>
-        <Image source={{ uri: `${user.userIcon}` }} style={styles.userIcon} />
-        <View style={styles.nameWrapper}>
-          <Text style={styles.name}>{`${user.firstName} ${user.lastName}`}</Text>
-          <Text style={styles.date}>{`${date} ${startTime} ~ ${endTime}`}</Text>
+    <SafeAreaView>
+      <ScrollView>
+        <View style={styles.userWrapper}>
+          <Image source={{ uri: `${user.userIcon}` }} style={styles.userIcon} />
+          <View style={styles.nameWrapper}>
+            <Text style={styles.name}>{`${user.firstName} ${user.lastName}`}</Text>
+            <Text style={styles.date}>{`${date} ${startTime} ~ ${endTime}`}</Text>
+          </View>
         </View>
-      </View>
-      <FlatList
-        data={item.item.photo}
-        horizontal={true}
-        renderItem={_renderPhoto}
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={_keyExtractor}
-        onViewableItemsChanged={onViewRef.current}
-        viewabilityConfig={viewConfigRef.current}
-      />
-      <PagenationDot
-        style={styles.pagenationDotStyle}
-        foucsItemIndex={viewableItemIndex}
-        list={item.item.photo}
-      />
-      <View style={commonStyles.bodyWrapper}>
-        <ReportMenuList menuList={item.item.menu} />
-        <PriceDetail menuList={item.item.menu} />
-        <Button onPress={_onDeletePress} text="delete" deleteButton={true} style={styles.button} />
-      </View>
-    </ScrollView>
+        <FlatList
+          data={item.item.photo}
+          horizontal={true}
+          renderItem={_renderPhoto}
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={_keyExtractor}
+          onViewableItemsChanged={onViewRef.current}
+          viewabilityConfig={viewConfigRef.current}
+        />
+        <PagenationDot
+          style={styles.pagenationDotStyle}
+          foucsItemIndex={viewableItemIndex}
+          list={item.item.photo}
+        />
+        <View style={commonStyles.bodyWrapper}>
+          <ReportMenuList menuList={item.item.menu} />
+          <PriceDetail menuList={item.item.menu} />
+          <Button
+            onPress={_onDeletePress}
+            text="delete"
+            deleteButton={true}
+            style={styles.button}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
