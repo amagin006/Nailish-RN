@@ -30,7 +30,7 @@ const ReportDetail = ({ navigation }) => {
   const _keyExtractor = item => `${item.id}`;
 
   const _onDeletePress = () => {
-    console.log('========+++++++========');
+    console.log('========_onDeletePress========');
   };
 
   const onViewRef = React.useRef(({ viewableItems }) => {

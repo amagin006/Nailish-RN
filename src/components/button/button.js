@@ -21,8 +21,12 @@ Button.propTypes = {
   style: PropTypes.object,
   text: PropTypes.string,
   color: PropTypes.string,
-  deleteButton: PropTypes.boolean,
+  deleteButton: PropTypes.bool,
   onPress: PropTypes.func,
+};
+
+Button.defaltProps = {
+  deleteButton: false,
 };
 
 const styles = StyleSheet.create({
