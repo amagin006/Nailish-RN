@@ -115,6 +115,14 @@ const ReportEdit = ({ navigation }) => {
   );
 };
 
+ReportEdit.navigationOptions = {
+  title: 'hello',
+  headerRight: (
+    <View>
+      <Text>heidho</Text>
+    </View>
+  ),
+};
 ReportEdit.propTypes = { navigation: PropTypes.object };
 
 const DEFAULTPHOTOS = [
