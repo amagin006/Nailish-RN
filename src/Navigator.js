@@ -40,6 +40,7 @@ const CustomerListStack = createStackNavigator(
       headerStyle: {
         backgroundColor: '#D9534F',
       },
+      headerBackTitleVisible: false,
       headerTintColor: '#fff',
       headerTitleStyle: {
         fontWeight: 'bold',
