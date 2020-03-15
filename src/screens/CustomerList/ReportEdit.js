@@ -117,11 +117,13 @@ const ReportEdit = ({ navigation }) => {
 
 ReportEdit.navigationOptions = {
   title: 'hello',
-  headerRight: (
-    <View>
-      <Text>heidho</Text>
-    </View>
-  ),
+  headerRight: function headerRight() {
+    return (
+      <TouchableOpacity style={styles.headerRight} onPress={() => console.log('onPress Saved')}>
+        <Text style={styles.headerRightText}>Save</Text>
+      </TouchableOpacity>
+    );
+  },
 };
 ReportEdit.propTypes = { navigation: PropTypes.object };
 
@@ -211,6 +213,14 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     height: 200,
     paddingHorizontal: 10,
+  },
+  headerRight: {
+    padding: 10,
+    marginRight: 10,
+  },
+  headerRightText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 
