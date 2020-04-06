@@ -13,9 +13,9 @@ import {
 import PropTypes from 'prop-types';
 import RNPickerSelect from 'react-native-picker-select';
 
+import Button from '../../components/button/button';
 import ReportMenuList from '../../components/reportDetail/reportMenuList';
 import commonStyles from '../../components/styles/commonStyles';
-import Button from '../../components/button/button';
 
 const ReportEdit = ({ navigation }) => {
   const [mainPhoto, setMainPhoto] = useState(
@@ -116,7 +116,7 @@ const ReportEdit = ({ navigation }) => {
 };
 
 ReportEdit.navigationOptions = {
-  title: 'hello',
+  title: 'Edit Report',
   headerRight: function headerRight() {
     return (
       <TouchableOpacity style={styles.headerRight} onPress={() => console.log('onPress Saved')}>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    marginVertical: 10,
+    marginVertical: 12,
   },
   textInput: {
     width: 200,

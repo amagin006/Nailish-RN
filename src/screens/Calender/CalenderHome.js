@@ -28,8 +28,8 @@ function makeMarked(appointDates) {
       Object.assign(c, {
         [v]: {
           dots: [
-            { key: 'hello', color: 'red', selectedDotColor: 'blue' },
-            { key: 'massage', color: 'red', selectedDotColor: 'blue' },
+            { key: 'hello', color: 'red', selectedDotColor: 'red' },
+            { key: 'massage', color: 'blue', selectedDotColor: 'red' },
           ],
           marked: true,
         },
@@ -78,10 +78,14 @@ const CalenderHome = ({ navigation }) => {
     setWeeks(numberOfWeeks);
   };
 
+  const _onPressList = item => {
+    navigation.navigate('EditAppointment', { item: item });
+  };
+
   const _renderFlatListItem = listItem => {
     const { item } = listItem;
     return (
-      <TouchableOpacity style={styles.listItemWrapper}>
+      <TouchableOpacity onPress={() => _onPressList(item)} style={styles.listItemWrapper}>
         <Image source={{ uri: `${item.user.userIcon}` }} style={styles.userIcon} />
         <View style={styles.textWrapper}>
           <Text style={styles.name}>{`${item.user.firstName} ${item.user.lastName}`}</Text>
