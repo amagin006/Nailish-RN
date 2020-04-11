@@ -28,8 +28,8 @@ function makeMarked(appointDates) {
       Object.assign(c, {
         [v]: {
           dots: [
-            { key: 'hello', color: 'red', selectedDotColor: 'red' },
-            { key: 'massage', color: 'blue', selectedDotColor: 'red' },
+            { key: 'hello', color: 'red' },
+            { key: 'massage', color: 'blue' },
           ],
           marked: true,
         },
@@ -56,7 +56,12 @@ const CalenderHome = ({ navigation }) => {
 
   useEffect(() => {
     const markedAppointment = makeMarked(nextDay);
-    markedAppointment[selectedDay] = { selected: true, disableTouchEvent: true };
+    console.log('markedAppointment', markedAppointment);
+    markedAppointment[selectedDay] = {
+      ...markedAppointment[selectedDay],
+      selected: true,
+      disableTouchEvent: true,
+    };
     setMarkedDates(markedAppointment);
     navigation.setParams({ onSavePress: _addCustomerReport });
   }, [selectedDay]);

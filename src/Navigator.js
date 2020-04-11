@@ -64,7 +64,7 @@ const CalenderStack = createStackNavigator(
   },
   {
     initialRouteName: 'CalenderHome',
-    defaultNavigationOptions: () => ({
+    defaultNavigationOptions: {
       headerStyle: {
         backgroundColor: '#D9534F',
       },
@@ -72,7 +72,7 @@ const CalenderStack = createStackNavigator(
       headerTitleStyle: {
         fontWeight: 'bold',
       },
-    }),
+    },
   },
 );
 
