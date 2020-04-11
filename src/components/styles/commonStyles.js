@@ -1,6 +1,6 @@
 export default {
   bodyWrapper: {
-    marginHorizontal: '5%',
+    marginHorizontal: '8%',
   },
   menuWrapper: {
     flexDirection: 'row',
@@ -8,7 +8,7 @@ export default {
     marginTop: 10,
   },
   leftColumn: {
-    fontSize: 18,
+    fontSize: 15,
     width: '28%',
     color: '#9c9c9c',
   },

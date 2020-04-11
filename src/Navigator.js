@@ -13,6 +13,7 @@ import CustomerEdit from './screens/CustomerList/CustomerEdit';
 import ReportDetail from './screens/CustomerList/ReportDetail';
 import ReportEdit from './screens/CustomerList/ReportEdit';
 import CalenderHome from './screens/Calender/CalenderHome';
+import EditAppointment from './screens/Calender/EditAppointment';
 import Login from './screens/Login/Login';
 import SignUp from './screens/Login/SignUp';
 
@@ -53,6 +54,12 @@ const CalenderStack = createStackNavigator(
   {
     CalenderHome: {
       screen: CalenderHome,
+    },
+    EditAppointment: {
+      screen: EditAppointment,
+    },
+    CustomerListHome: {
+      screen: CustomerListHome,
     },
   },
   {

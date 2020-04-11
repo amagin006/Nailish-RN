@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { CalendarList } from 'react-native-calendars';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Feather } from '@expo/vector-icons';
+import PropTypes from 'prop-types';
 
 function dateFormatte(date) {
   return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date
@@ -27,8 +28,8 @@ function makeMarked(appointDates) {
       Object.assign(c, {
         [v]: {
           dots: [
-            { key: 'hello', color: 'red', selectedDotColor: 'blue' },
-            { key: 'massage', color: 'red', selectedDotColor: 'blue' },
+            { key: 'hello', color: 'red', selectedDotColor: 'red' },
+            { key: 'massage', color: 'blue', selectedDotColor: 'red' },
           ],
           marked: true,
         },
@@ -47,7 +48,7 @@ function getWeeksInMonth(year, month_number) {
   return Math.ceil(used / 7);
 }
 
-const Calender = () => {
+const CalenderHome = ({ navigation }) => {
   const today = dateFormatte(new Date());
   const [selectedDay, setSelectedDay] = useState(today);
   const [markedDates, setMarkedDates] = useState({});
@@ -57,7 +58,13 @@ const Calender = () => {
     const markedAppointment = makeMarked(nextDay);
     markedAppointment[selectedDay] = { selected: true, disableTouchEvent: true };
     setMarkedDates(markedAppointment);
+    navigation.setParams({ onSavePress: _addCustomerReport });
   }, [selectedDay]);
+
+  const _addCustomerReport = () => {
+    console.log('addCustomerReport');
+    navigation.navigate('EditAppointment');
+  };
 
   const _selectedDate = day => {
     console.log('selectedDate', day);
@@ -72,10 +79,14 @@ const Calender = () => {
     setWeeks(numberOfWeeks);
   };
 
+  const _onPressList = item => {
+    navigation.navigate('EditAppointment', { item: item });
+  };
+
   const _renderFlatListItem = listItem => {
     const { item } = listItem;
     return (
-      <TouchableOpacity style={styles.listItemWrapper}>
+      <TouchableOpacity onPress={() => _onPressList(item)} style={styles.listItemWrapper}>
         <Image source={{ uri: `${item.user.userIcon}` }} style={styles.userIcon} />
         <View style={styles.textWrapper}>
           <Text style={styles.name}>{`${item.user.firstName} ${item.user.lastName}`}</Text>
@@ -119,6 +130,7 @@ const Calender = () => {
       />
       <FlatList
         data={FAKEDATA}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         keyExtractor={item => `${item.id}`}
         renderItem={_renderFlatListItem}
       />
@@ -126,8 +138,26 @@ const Calender = () => {
   );
 };
 
+CalenderHome.propTypes = { navigation: PropTypes.object };
+
+CalenderHome.navigationOptions = screenProps => {
+  return {
+    headerRight: function headerRight() {
+      return (
+        <TouchableOpacity
+          onPress={screenProps.navigation.getParam('onSavePress')}
+          style={styles.headerRightSave}>
+          <Feather name="plus" size={32} color="#fff" />
+        </TouchableOpacity>
+      );
+    },
+  };
+};
+
 const styles = StyleSheet.create({
-  // calender: { height: 340 },
+  headerRightSave: {
+    marginRight: 14,
+  },
   listItemWrapper: {
     flexDirection: 'row',
     paddingVertical: 10,
@@ -150,9 +180,14 @@ const styles = StyleSheet.create({
     color: '#b0b0b0',
     marginTop: 5,
   },
+  separator: {
+    height: 1,
+    width: '100%',
+    backgroundColor: '#e6e6e6',
+  },
 });
 
-export default Calender;
+export default CalenderHome;
 
 const FAKEDATA = [
   {
