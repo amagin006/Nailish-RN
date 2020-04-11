@@ -58,6 +58,9 @@ const CalenderStack = createStackNavigator(
     EditAppointment: {
       screen: EditAppointment,
     },
+    CustomerListHome: {
+      screen: CustomerListHome,
+    },
   },
   {
     initialRouteName: 'CalenderHome',

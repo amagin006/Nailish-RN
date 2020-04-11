@@ -20,7 +20,12 @@ const CustomerListHome = ({ navigation }) => {
     _renderItem.propTypes = { item: PropTypes.object };
 
     const _onPressCard = item => {
-      navigation.navigate('CustomerReport', item);
+      if (navigation.state.params && navigation.state.params.selectClient) {
+        navigation.state.params.selectClient(item);
+        navigation.goBack();
+      } else {
+        navigation.navigate('CustomerReport', item);
+      }
     };
 
     return (

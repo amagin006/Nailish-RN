@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -16,24 +16,57 @@ import commonStyles from '../../components/styles/commonStyles';
 
 const EditAppointment = ({ navigation }) => {
   const [memo, setMemo] = useState();
+  const [user, setUser] = useState();
 
-  const { item } = navigation.state.params;
-  console.log('userIcon', item);
+  useEffect(() => {
+    const params = navigation.state.params;
+    if (params && params.item) {
+      const { user } = params.item;
+      setUser(user);
+    }
+  }, [navigation.state.params]);
 
   const _onPressSelectClient = () => {
     console.log('_onPressSelectClient');
+    navigation.navigate('CustomerListHome', {
+      selectClient: user => {
+        setUser(user);
+      },
+    });
   };
 
-  const _onPressSelectMenu = () => {};
-  const _onChageMemo = () => {};
+  const _onPressSelectMenu = () => {
+    console.log('onPressSelectMenu');
+  };
+
+  const _onChageMemo = text => {
+    setMemo(text);
+  };
+
+  const _onPressDelete = () => {
+    console.log('_onPressDelete');
+  };
 
   return (
     <ScrollView>
       <View style={commonStyles.bodyWrapper}>
         <TouchableOpacity style={styles.card} onPress={_onPressSelectClient}>
-          <Image source={{ uri: `${item.user.userIcon}` }} style={styles.userIcon} />
-          <Text style={styles.selectClientText}>Select Client</Text>
+          {user ? (
+            <>
+              <Image source={{ uri: `${user.userIcon}` }} style={styles.userIcon} />
+              <Text style={styles.selectClientText}>{`${user.firstName} ${user.lastName}`}</Text>
+            </>
+          ) : (
+            <>
+              <Image
+                source={require('../../../assets/images/person1.png')}
+                style={styles.userIcon}
+              />
+              <Text style={styles.selectClientText}>Select Client</Text>
+            </>
+          )}
         </TouchableOpacity>
+
         <View style={styles.dateBlock}>
           <View style={styles.columnWrapper}>
             <Text style={commonStyles.leftColumn}>Visit Date</Text>
@@ -54,6 +87,14 @@ const EditAppointment = ({ navigation }) => {
           <Text style={commonStyles.leftColumn}>Memo</Text>
           <TextInput multiline style={styles.memoInput} onChangeText={_onChageMemo} value={memo} />
         </View>
+        {user && (
+          <Button
+            onPress={_onPressDelete}
+            text={'Delete Appointment'}
+            style={styles.deleteButton}
+            deleteButton
+          />
+        )}
       </View>
     </ScrollView>
   );
@@ -111,6 +152,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     height: 200,
     paddingHorizontal: 10,
+  },
+  deleteButton: {
+    marginBottom: 30,
   },
 });
 

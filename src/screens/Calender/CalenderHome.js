@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { CalendarList } from 'react-native-calendars';
-import { FontAwesome } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 
 function dateFormatte(date) {
@@ -63,6 +63,7 @@ const CalenderHome = ({ navigation }) => {
 
   const _addCustomerReport = () => {
     console.log('addCustomerReport');
+    navigation.navigate('EditAppointment');
   };
 
   const _selectedDate = day => {
@@ -146,7 +147,7 @@ CalenderHome.navigationOptions = screenProps => {
         <TouchableOpacity
           onPress={screenProps.navigation.getParam('onSavePress')}
           style={styles.headerRightSave}>
-          <FontAwesome name="plus" size={32} color="#fff" />
+          <Feather name="plus" size={32} color="#fff" />
         </TouchableOpacity>
       );
     },
