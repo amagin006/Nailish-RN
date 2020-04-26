@@ -1,0 +1,7 @@
+export const CREATE_USER = 'CREATE_USER';
+export const LOADING_LOGIN = 'LOADING_LOGIN';
+export const GOOGLE_LOGIN = 'GOOGLE_LOGIN';
+
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const LOGIN_FAILED = 'LOGIN_FAILED';
+export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';

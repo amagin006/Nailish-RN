@@ -9,69 +9,40 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import Firebase, { auth } from '../../config/Firebase';
+import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
-import * as Google from 'expo-google-app-auth';
-import {
-  GOOGLE_AUTH_IOS_CLIENT_ID,
-  GOOGLE_AUTH_ANDROID_CLIENT_ID,
-  GOOGLE_IOS_STANDALONE_CLIENT_ID,
-  GOOGLE_ANDROID_STANDALONE_CLIENT_ID,
-} from 'react-native-dotenv';
+
+import { userLoginWithPass, userLogout, googleLogin } from '../../redux/actions/auth';
 
 const Login = props => {
   const [email, setEmail] = useState('');
   const [password, setPassward] = useState('');
   const [isPasswordInVisible, setIsPasswordInVisible] = useState(true);
   const [emailPassError, setEmaiPassError] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
+
+  const dispatch = useDispatch();
+  const reduxState = useSelector(state => state);
 
   const _onPressLoginWithEmail = () => {
-    Firebase.auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        console.log('login');
-        props.navigation.navigate('CustomerListHome');
-      })
-      .catch(error => {
-        console.log('Error signInWithEmailAndPassword: ', error);
-        setEmaiPassError(true);
-      });
+    dispatch(userLoginWithPass({ email, password }));
   };
 
   const _googleLogin = async () => {
-    try {
-      const result = await Google.logInAsync({
-        iosClientId: GOOGLE_AUTH_IOS_CLIENT_ID,
-        androidClientId: GOOGLE_AUTH_ANDROID_CLIENT_ID,
-        iosStandaloneAppClientId: GOOGLE_IOS_STANDALONE_CLIENT_ID,
-        androidStandaloneAppClientId: GOOGLE_ANDROID_STANDALONE_CLIENT_ID,
-        scopes: ['profile', 'email'],
-      });
-
-      console.log('res----googleLogin', result);
-      if (result.type === 'success') {
-        const { idToken, accessToken } = result;
-        const credential = Firebase.auth.GoogleAuthProvider.credential(idToken, accessToken);
-        try {
-          auth.signInWithCredential(credential);
-          props.navigation.navigate('CustomerListHome');
-        } catch (err) {
-          console.log('Google Auth Error: ', err);
-        }
-      } else {
-        console.log('Google Auth is not success - Error_type:', result.type);
-      }
-    } catch (err) {
-      console.log('Google login Async - Error: ', err);
-    }
+    dispatch(googleLogin());
   };
 
   const _onPressSignup = () => {
-    // props.navigation.navigate('SignUp');
+    setIsSignup(true);
+  };
+
+  const _onForgetPass = () => {
+    // dispatch(userLogout());
   };
 
   const borderColor = emailPassError ? { borderColor: '#d61d00' } : { borderColor: '#ccc' };
+  console.log('LoginScreen - reduxState', reduxState);
   return (
     <SafeAreaView style={styles.wrapper}>
       <Image
@@ -111,12 +82,22 @@ const Login = props => {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.forgetButton}>
-          <Text style={styles.forgetText}>Forget password?</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.signButton} onPress={_onPressLoginWithEmail}>
-          <Text style={styles.singButtonText}>Login</Text>
-        </TouchableOpacity>
+        {isSignup ? (
+          <TouchableOpacity
+            style={[styles.signButton, styles.createButton]}
+            onPress={_onPressLoginWithEmail}>
+            <Text style={styles.singButtonText}>Create Account</Text>
+          </TouchableOpacity>
+        ) : (
+          <>
+            <TouchableOpacity style={styles.forgetButton} onPress={_onForgetPass}>
+              <Text style={styles.forgetText}>Forget password?</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.signButton} onPress={_onPressLoginWithEmail}>
+              <Text style={styles.singButtonText}>Login</Text>
+            </TouchableOpacity>
+          </>
+        )}
         <View style={styles.border} />
         <TouchableOpacity style={styles.googleSingButton} onPress={_googleLogin}>
           <Image
@@ -126,9 +107,13 @@ const Login = props => {
           />
         </TouchableOpacity>
         <View style={styles.signUpBox}>
-          <Text style={styles.signUpleftText}>Don&apos;t have an account?</Text>
-          <TouchableOpacity style={styles.signUpButton} onPress={_onPressSignup}>
-            <Text style={styles.signUpButtonText}>Sign up</Text>
+          <Text style={styles.signUpleftText}>
+            {isSignup ? 'Already have account?' : "Don't have an account?"}
+          </Text>
+          <TouchableOpacity
+            style={styles.signUpButton}
+            onPress={isSignup ? () => setIsSignup(false) : _onPressSignup}>
+            <Text style={styles.signUpButtonText}>{isSignup ? 'Sign in' : 'Sign up'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -193,9 +178,13 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     marginHorizontal: 20,
   },
+  createButton: {
+    backgroundColor: '#2482bd',
+  },
   singButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
     paddingVertical: 10,
   },
   border: {
