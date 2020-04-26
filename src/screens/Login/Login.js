@@ -3,15 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   Image,
   TextInput,
   Platform,
-  KeyboardAvoidingView,
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import firebase, { auth } from '../../config/Firebase';
+import Firebase, { auth } from '../../config/Firebase';
 import { Ionicons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 import * as Google from 'expo-google-app-auth';
@@ -28,8 +26,8 @@ const Login = props => {
   const [isPasswordInVisible, setIsPasswordInVisible] = useState(true);
   const [emailPassError, setEmaiPassError] = useState(false);
 
-  const _onPressLogin = () => {
-    auth()
+  const _onPressLoginWithEmail = () => {
+    Firebase.auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
         console.log('login');
@@ -54,9 +52,10 @@ const Login = props => {
       console.log('res----googleLogin', result);
       if (result.type === 'success') {
         const { idToken, accessToken } = result;
-        const credential = firebase.auth.GoogleAuthProvider.credential(idToken, accessToken);
+        const credential = Firebase.auth.GoogleAuthProvider.credential(idToken, accessToken);
         try {
           auth.signInWithCredential(credential);
+          props.navigation.navigate('CustomerListHome');
         } catch (err) {
           console.log('Google Auth Error: ', err);
         }
@@ -75,10 +74,12 @@ const Login = props => {
   const borderColor = emailPassError ? { borderColor: '#d61d00' } : { borderColor: '#ccc' };
   return (
     <SafeAreaView style={styles.wrapper}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
-        style={styles.contentWrapper}>
-        <Image style={styles.logoImage} source={require('../../../assets/images/logo2.png')} />
+      <Image
+        style={styles.logoImage}
+        resizeMode={'contain'}
+        source={require('../../../assets/images/logo2.png')}
+      />
+      <View style={styles.inner}>
         {emailPassError ? (
           <Text style={styles.errorText}>Email or Password is wrong.</Text>
         ) : (
@@ -110,12 +111,27 @@ const Login = props => {
             />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.signButton} onPress={_onPressLogin}>
+        <TouchableOpacity style={styles.forgetButton}>
+          <Text style={styles.forgetText}>Forget password?</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.signButton} onPress={_onPressLoginWithEmail}>
           <Text style={styles.singButtonText}>Login</Text>
         </TouchableOpacity>
-        <Button title={'goSignUp'} onPress={_onPressSignup} />
-        <Button title={'google'} onPress={_googleLogin} />
-      </KeyboardAvoidingView>
+        <View style={styles.border} />
+        <TouchableOpacity style={styles.googleSingButton} onPress={_googleLogin}>
+          <Image
+            style={styles.googleImage}
+            resizeMode={'contain'}
+            source={require('../../../assets/images/google_signin_btn.png')}
+          />
+        </TouchableOpacity>
+        <View style={styles.signUpBox}>
+          <Text style={styles.signUpleftText}>Don&apos;t have an account?</Text>
+          <TouchableOpacity style={styles.signUpButton} onPress={_onPressSignup}>
+            <Text style={styles.signUpButtonText}>Sign up</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -124,21 +140,20 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     alignItems: 'center',
-    // justifyContent: 'center',
   },
-  contentWrapper: {
+  inner: {
     width: '80%',
+    marginTop: 30,
   },
   logoImage: {
     alignSelf: 'center',
-    width: '80%',
-    resizeMode: 'contain',
-    marginBottom: 30,
+    height: 80,
+    marginTop: '18%',
   },
   inputTextBox: {
-    height: 48,
     borderWidth: 1,
     paddingHorizontal: 10,
+    paddingVertical: Platform.OS === 'ios' ? 5 : 0,
     borderRadius: 8,
     marginBottom: 20,
     flexDirection: 'row',
@@ -147,6 +162,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
+    paddingVertical: 8,
   },
   errorText: {
     color: '#d61d00',
@@ -154,10 +170,20 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   space: {
-    marginBottom: 24,
+    marginBottom: Platform.OS === 'ios' ? 25 : 27,
   },
   eyeIcon: {
     paddingTop: 3,
+  },
+  forgetButton: {
+    alignSelf: 'center',
+    marginBottom: 6,
+    borderBottomColor: '#424242',
+    borderBottomWidth: 1,
+  },
+  forgetText: {
+    color: '#424242',
+    paddingBottom: 3,
   },
   signButton: {
     justifyContent: 'center',
@@ -171,6 +197,35 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     paddingVertical: 10,
+  },
+  border: {
+    marginVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#cfcfcf',
+  },
+  googleSingButton: {
+    width: '48%',
+    marginTop: -20,
+    alignSelf: 'center',
+  },
+  googleImage: {
+    width: '100%',
+  },
+  signUpButton: {
+    alignSelf: 'center',
+    borderBottomColor: '#344dd9',
+    borderBottomWidth: 1,
+  },
+  signUpBox: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  signUpleftText: {
+    color: '#7d7d7d',
+    marginRight: 6,
+  },
+  signUpButtonText: {
+    color: '#344dd9',
   },
 });
 
