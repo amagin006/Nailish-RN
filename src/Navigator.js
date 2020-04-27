@@ -14,6 +14,7 @@ import ReportDetail from './screens/CustomerList/ReportDetail';
 import ReportEdit from './screens/CustomerList/ReportEdit';
 import CalenderHome from './screens/Calender/CalenderHome';
 import EditAppointment from './screens/Calender/EditAppointment';
+import SettingHome from './screens/Setting/SettingHome';
 import Login from './screens/Login/Login';
 
 const CustomerListStack = createStackNavigator(
@@ -75,6 +76,26 @@ const CalenderStack = createStackNavigator(
   },
 );
 
+const SettingStack = createStackNavigator(
+  {
+    SettingHome: {
+      screen: SettingHome,
+    },
+  },
+  {
+    initialRouteName: 'SettingHome',
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: '#D9534F',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    },
+  },
+);
+
 const LoginRoute = {
   Login: {
     screen: Login,
@@ -103,6 +124,20 @@ const BottomTabRoutes = {
       tabBarIcon: ({ tintColor }) => (
         <MaterialCommunityIcons
           name="calendar-clock"
+          style={{ marginTop: 8, color: tintColor }}
+          size={24}
+          color="gray"
+        />
+      ),
+    },
+  },
+  SettingStack: {
+    screen: SettingStack,
+    navigationOptions: {
+      title: 'Setting',
+      tabBarIcon: ({ tintColor }) => (
+        <MaterialCommunityIcons
+          name="settings"
           style={{ marginTop: 8, color: tintColor }}
           size={24}
           color="gray"

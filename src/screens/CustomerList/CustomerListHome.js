@@ -31,7 +31,7 @@ const CustomerListHome = ({ navigation }) => {
     return (
       <TouchableOpacity style={styles.card} onPress={() => _onPressCard(item)}>
         <Image source={{ uri: `${item.userIcon}` }} style={styles.userIcon} />
-        <View style={styles.customerInfo}>
+        <View>
           <Text style={styles.name}>{`${item.firstName} ${item.lastName}`}</Text>
           <Text style={styles.lastVisit}>{`${item.lastVisit}`}</Text>
         </View>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,13 @@ import {
   Platform,
   SafeAreaView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 
-import { userLoginWithPass, userLogout, googleLogin } from '../../redux/actions/auth';
+import { userLoginWithPass, googleLogin, createUser } from '../../redux/actions/auth';
 
 const Login = props => {
   const [email, setEmail] = useState('');
@@ -25,15 +26,29 @@ const Login = props => {
   const dispatch = useDispatch();
   const reduxState = useSelector(state => state);
 
-  const _onPressLoginWithEmail = () => {
-    dispatch(userLoginWithPass({ email, password }));
+  useEffect(() => {
+    if (reduxState.auth.isLogin) {
+      props.navigation.navigate('CustomerListHome');
+    }
+  }, [reduxState.auth]);
+
+  const _onLoginWithEmail = () => {
+    if (email && password) {
+      dispatch(userLoginWithPass(email, password));
+    } else {
+      setEmaiPassError(true);
+    }
   };
 
-  const _googleLogin = async () => {
+  const _googleLogin = () => {
     dispatch(googleLogin());
   };
 
-  const _onPressSignup = () => {
+  const _onCreateUser = () => {
+    dispatch(createUser(email, password));
+  };
+
+  const _onSignup = () => {
     setIsSignup(true);
   };
 
@@ -45,80 +60,92 @@ const Login = props => {
   console.log('LoginScreen - reduxState', reduxState);
   return (
     <SafeAreaView style={styles.wrapper}>
-      <Image
-        style={styles.logoImage}
-        resizeMode={'contain'}
-        source={require('../../../assets/images/logo2.png')}
-      />
-      <View style={styles.inner}>
-        {emailPassError ? (
-          <Text style={styles.errorText}>Email or Password is wrong.</Text>
-        ) : (
-          <View style={styles.space} />
-        )}
-        <View style={[styles.inputTextBox, borderColor]}>
-          <TextInput
-            style={styles.textInput}
-            value={email}
-            onChangeText={text => setEmail(text)}
-            placeholder={'Enter your email'}
-            onFocus={() => setEmaiPassError(false)}
-          />
+      {reduxState.auth.isLoadingLogin ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#9c9c9c" />
         </View>
-        <View style={[styles.inputTextBox, borderColor]}>
-          <TextInput
-            style={styles.textInput}
-            value={password}
-            onChangeText={text => setPassward(text)}
-            placeholder={'Enter your password'}
-            onFocus={() => setEmaiPassError(false)}
-            secureTextEntry={isPasswordInVisible}
-          />
-          <TouchableOpacity onPress={() => setIsPasswordInVisible(!isPasswordInVisible)}>
-            <Ionicons
-              style={styles.eyeIcon}
-              name={isPasswordInVisible ? 'md-eye-off' : 'md-eye'}
-              size={26}
-            />
-          </TouchableOpacity>
-        </View>
-        {isSignup ? (
-          <TouchableOpacity
-            style={[styles.signButton, styles.createButton]}
-            onPress={_onPressLoginWithEmail}>
-            <Text style={styles.singButtonText}>Create Account</Text>
-          </TouchableOpacity>
-        ) : (
-          <>
-            <TouchableOpacity style={styles.forgetButton} onPress={_onForgetPass}>
-              <Text style={styles.forgetText}>Forget password?</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.signButton} onPress={_onPressLoginWithEmail}>
-              <Text style={styles.singButtonText}>Login</Text>
-            </TouchableOpacity>
-          </>
-        )}
-        <View style={styles.border} />
-        <TouchableOpacity style={styles.googleSingButton} onPress={_googleLogin}>
+      ) : (
+        <>
           <Image
-            style={styles.googleImage}
+            style={styles.logoImage}
             resizeMode={'contain'}
-            source={require('../../../assets/images/google_signin_btn.png')}
+            source={require('../../../assets/images/logo2.png')}
           />
-        </TouchableOpacity>
-        <View style={styles.signUpBox}>
-          <Text style={styles.signUpleftText}>
-            {isSignup ? 'Already have account?' : "Don't have an account?"}
-          </Text>
-          <TouchableOpacity
-            style={styles.signUpButton}
-            onPress={isSignup ? () => setIsSignup(false) : _onPressSignup}>
-            <Text style={styles.signUpButtonText}>{isSignup ? 'Sign in' : 'Sign up'}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+          <View style={styles.inner}>
+            {emailPassError ? (
+              <Text style={styles.errorText}>Email or Password is wrong.</Text>
+            ) : (
+              <View style={styles.space} />
+            )}
+            <View style={[styles.inputTextBox, borderColor]}>
+              <TextInput
+                style={styles.textInput}
+                value={email}
+                onChangeText={text => setEmail(text)}
+                placeholder={'Enter your email'}
+                onFocus={() => setEmaiPassError(false)}
+              />
+            </View>
+            <View style={[styles.inputTextBox, borderColor]}>
+              <TextInput
+                style={styles.textInput}
+                value={password}
+                onChangeText={text => setPassward(text)}
+                placeholder={'Enter your password'}
+                onFocus={() => setEmaiPassError(false)}
+                secureTextEntry={isPasswordInVisible}
+              />
+              <TouchableOpacity onPress={() => setIsPasswordInVisible(!isPasswordInVisible)}>
+                <Ionicons
+                  style={styles.eyeIcon}
+                  name={isPasswordInVisible ? 'md-eye-off' : 'md-eye'}
+                  size={26}
+                />
+              </TouchableOpacity>
+            </View>
+            {isSignup ? (
+              <TouchableOpacity
+                style={[styles.signButton, styles.createButton]}
+                onPress={_onCreateUser}>
+                <Text style={styles.singButtonText}>Create Account</Text>
+              </TouchableOpacity>
+            ) : (
+              <>
+                <TouchableOpacity style={styles.forgetButton} onPress={_onForgetPass}>
+                  <Text style={styles.forgetText}>Forget password?</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.signButton} onPress={_onLoginWithEmail}>
+                  <Text style={styles.singButtonText}>Login</Text>
+                </TouchableOpacity>
+              </>
+            )}
+            <View style={styles.border} />
+            <TouchableOpacity style={styles.googleSingButton} onPress={_googleLogin}>
+              <Image
+                style={styles.googleImage}
+                resizeMode={'contain'}
+                source={require('../../../assets/images/google_signin_btn.png')}
+              />
+            </TouchableOpacity>
+            <View style={styles.signUpBox}>
+              <Text style={styles.signUpleftText}>
+                {isSignup ? 'Already have account?' : "Don't have an account?"}
+              </Text>
+              <TouchableOpacity
+                style={styles.signUpButton}
+                onPress={isSignup ? () => setIsSignup(false) : _onSignup}>
+                <Text style={styles.signUpButtonText}>{isSignup ? 'Sign in' : 'Sign up'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
+};
+
+Login.propTypes = {
+  navigation: PropTypes.object,
 };
 
 const styles = StyleSheet.create({
@@ -217,9 +244,5 @@ const styles = StyleSheet.create({
     color: '#344dd9',
   },
 });
-
-Login.propTypes = {
-  navigation: PropTypes.object,
-};
 
 export default Login;

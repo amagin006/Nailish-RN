@@ -4,7 +4,6 @@ import {
   LOADING_LOGIN,
   LOGIN_FAILED,
   LOGOUT_SUCCESS,
-  GOOGLE_LOGIN,
 } from './actionTypes';
 import * as Google from 'expo-google-app-auth';
 import {
@@ -45,9 +44,8 @@ function logoutSuccess() {
   };
 }
 
-export const userLoginWithPass = userEmailPassword => {
-  console.log('userLogin--action.js', userEmailPassword);
-  const { email, password } = userEmailPassword;
+export const userLoginWithPass = (email, password) => {
+  console.log('userLogin--action.js', email, password);
   return dispatch => {
     dispatch(loadingLogIn());
     Firebase.auth()
@@ -78,11 +76,25 @@ export const userLogout = () => {
   };
 };
 
-export const createUser = userEmailPassword => {
-  console.log('createUser---action.js', userEmailPassword);
+function createNewUser() {
+  console.log('creatNewUser');
   return {
     type: CREATE_USER,
-    payload: userEmailPassword,
+  };
+}
+
+export const createUser = (email, password) => {
+  console.log('createUser---action.js', email, password);
+  return dispatch => {
+    dispatch(loadingLogIn());
+    Firebase.auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        dispatch(createNewUser());
+      })
+      .catch(error => {
+        console.log('createUser Error: ', error);
+      });
   };
 };
 
@@ -96,20 +108,25 @@ export const googleLogin = () => {
       iosStandaloneAppClientId: GOOGLE_IOS_STANDALONE_CLIENT_ID,
       androidStandaloneAppClientId: GOOGLE_ANDROID_STANDALONE_CLIENT_ID,
       scopes: ['profile', 'email'],
-    }).then(result => {
-      if (result.type === 'success') {
-        console.log('res----googleLogin', result);
-        const { idToken, accessToken } = result;
-        const credential = Firebase.auth.GoogleAuthProvider.credential(idToken, accessToken);
-        try {
-          auth.signInWithCredential(credential);
-          dispatch(loginSuccess());
-        } catch (err) {
-          console.log('Google Auth Error: ', err);
+    })
+      .then(result => {
+        if (result.type === 'success') {
+          console.log('res----googleLogin', result);
+          const { idToken, accessToken } = result;
+          const credential = Firebase.auth.GoogleAuthProvider.credential(idToken, accessToken);
+          try {
+            auth.signInWithCredential(credential);
+            dispatch(loginSuccess());
+          } catch (err) {
+            console.log('Google Auth Error: ', err);
+          }
+        } else {
+          console.log('Google Auth is not success - Error_type:', result.type);
         }
-      } else {
-        console.log('Google Auth is not success - Error_type:', result.type);
-      }
-    });
+      })
+      .catch(error => {
+        console.log('Google login - Error: ', error);
+        dispatch(loginFailed());
+      });
   };
 };

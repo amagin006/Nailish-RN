@@ -7,7 +7,7 @@ import {
 } from '../actions/actionTypes';
 
 const initialState = {
-  isLoding: false,
+  isLogin: false,
   isLoadingLogin: false,
 };
 
@@ -15,7 +15,11 @@ const reducer = (state = initialState, action) => {
   switch (action.type) {
     case CREATE_USER:
       console.log('CREATE_USER--Reducer', action);
-      break;
+      return {
+        ...state,
+        isLogin: true,
+        isLoadingLogin: false,
+      };
     case LOGIN_SUCCESS:
       console.log('LOGIN_SUCCESS', action);
       return {
@@ -27,7 +31,7 @@ const reducer = (state = initialState, action) => {
       console.log('LOGIN_FAILED', action);
       return {
         ...state,
-        isSignInFali: true,
+        isLoadingLogin: false,
       };
     case LOGOUT_SUCCESS:
       console.log('LOGOUT_SUCCESS');
