@@ -9,19 +9,27 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
+import { auth } from '../../config/Firebase';
 
 import { userLoginWithPass, googleLogin, createUser } from '../../redux/actions/auth';
+import commonStyles from '../../components/styles/commonStyles';
 
 const Login = props => {
   const [email, setEmail] = useState('');
+  const [forgetEmail, setForgetEmail] = useState('');
   const [password, setPassward] = useState('');
   const [isPasswordInVisible, setIsPasswordInVisible] = useState(true);
   const [emailPassError, setEmaiPassError] = useState(false);
+  const [forgetEmailError, setForgetEmailError] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
+  const [isForgetModalVisible, setIsForgetModalVisible] = useState(false);
+  const [isSendSuccess, setIsSendSuccess] = useState(false);
+  const [isSendLoading, setIsSendLoading] = useState(false);
 
   const dispatch = useDispatch();
   const reduxState = useSelector(state => state);
@@ -52,12 +60,22 @@ const Login = props => {
     setIsSignup(true);
   };
 
-  const _onForgetPass = () => {
-    // dispatch(userLogout());
+  const _onResetPassword = async () => {
+    setIsSendLoading(true);
+    try {
+      await auth.sendPasswordResetEmail(forgetEmail);
+      setForgetEmail('');
+      setIsSendSuccess(true);
+      setIsSendLoading(false);
+    } catch (error) {
+      console.log('Error forgetPassword send email: ', error);
+      setForgetEmailError(true);
+    }
   };
 
-  const borderColor = emailPassError ? { borderColor: '#d61d00' } : { borderColor: '#ccc' };
-  console.log('LoginScreen - reduxState', reduxState);
+  const borderColor =
+    emailPassError || forgetEmailError ? { borderColor: '#d61d00' } : { borderColor: '#ccc' };
+
   return (
     <SafeAreaView style={styles.wrapper}>
       {reduxState.auth.isLoadingLogin ? (
@@ -66,6 +84,78 @@ const Login = props => {
         </View>
       ) : (
         <>
+          {isForgetModalVisible && (
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={isForgetModalVisible}
+              onRequestClose={() => setIsForgetModalVisible(false)}>
+              <View style={styles.modalBack}>
+                <View style={styles.modalInner}>
+                  {isSendLoading ? (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                      <ActivityIndicator size="large" color="#9c9c9c" />
+                    </View>
+                  ) : isSendSuccess ? (
+                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                      <Text style={{ fontSize: 16, color: '#32a852', marginBottom: 60 }}>
+                        An email has been sent to the address you have provided.{'\n'}Please check
+                        your email
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.signButton}
+                        onPress={() => {
+                          setIsForgetModalVisible(false);
+                          setIsSendSuccess(false);
+                        }}>
+                        <Text style={styles.singButtonText}>OK</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <>
+                      <Text style={styles.resetPasswordText}>Reset your password</Text>
+                      <Text style={styles.resetPassDiscText}>
+                        Enter the email you use for Nailish, and we&apos;ll help you create a new
+                        password.
+                      </Text>
+                      <View style={styles.modalInnerbox}>
+                        <View>
+                          {forgetEmailError ? (
+                            <Text style={styles.errorText}>Email is invalid.</Text>
+                          ) : (
+                            <View style={styles.space} />
+                          )}
+                          <View style={[styles.inputTextBox, borderColor]}>
+                            <TextInput
+                              style={styles.textInput}
+                              value={forgetEmail}
+                              onChangeText={text => setForgetEmail(text)}
+                              placeholder={'Enter your email'}
+                              onFocus={() => setForgetEmailError(false)}
+                            />
+                          </View>
+                        </View>
+                      </View>
+                      <View style={styles.modalButtonBox}>
+                        <TouchableOpacity style={styles.signButton} onPress={_onResetPassword}>
+                          <Text style={styles.singButtonText}>send</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.signButton, styles.modalCancelButton]}
+                          onPress={() => {
+                            setIsForgetModalVisible(false);
+                            setForgetEmailError(false);
+                            setForgetEmail('');
+                          }}>
+                          <Text style={styles.singButtonText}>Cancel</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </>
+                  )}
+                </View>
+              </View>
+            </Modal>
+          )}
           <Image
             style={styles.logoImage}
             resizeMode={'contain'}
@@ -111,7 +201,9 @@ const Login = props => {
               </TouchableOpacity>
             ) : (
               <>
-                <TouchableOpacity style={styles.forgetButton} onPress={_onForgetPass}>
+                <TouchableOpacity
+                  style={styles.forgetButton}
+                  onPress={() => setIsForgetModalVisible(true)}>
                   <Text style={styles.forgetText}>Forget password?</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.signButton} onPress={_onLoginWithEmail}>
@@ -242,6 +334,38 @@ const styles = StyleSheet.create({
   },
   signUpButtonText: {
     color: '#344dd9',
+  },
+  modalBack: {
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalInner: {
+    backgroundColor: '#fff',
+    width: '90%',
+    height: '60%',
+    paddingHorizontal: '5%',
+    borderRadius: 20,
+  },
+  resetPasswordText: {
+    fontSize: 26,
+    color: commonStyles.baseTextColor,
+    marginVertical: 30,
+  },
+  modalInnerbox: {
+    flex: 1,
+    justifyContent: 'space-around',
+  },
+  resetPassDiscText: {
+    color: commonStyles.baseTextColor,
+  },
+  modalButtonBox: {
+    marginBottom: 40,
+  },
+  modalCancelButton: {
+    backgroundColor: '#ff9999',
+    marginTop: 20,
   },
 });
 

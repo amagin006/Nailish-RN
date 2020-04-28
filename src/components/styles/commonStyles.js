@@ -1,4 +1,5 @@
 export default {
+  baseTextColor: '#636363',
   bodyWrapper: {
     marginHorizontal: '8%',
   },
