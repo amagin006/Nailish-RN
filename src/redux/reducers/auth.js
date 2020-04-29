@@ -1,14 +1,17 @@
 import {
   CREATE_USER,
+  CREATE_USER_FAILED,
   LOGIN_SUCCESS,
   LOADING_LOGIN,
   LOGIN_FAILED,
   LOGOUT_SUCCESS,
+  FAILED_CONFIRM,
 } from '../actions/actionTypes';
 
 const initialState = {
   isLogin: false,
   isLoadingLogin: false,
+  isCreateFailed: false,
 };
 
 const reducer = (state = initialState, action) => {
@@ -19,6 +22,19 @@ const reducer = (state = initialState, action) => {
         ...state,
         isLogin: true,
         isLoadingLogin: false,
+      };
+    case CREATE_USER_FAILED:
+      console.log('CREATE_USER_FAILED', action.payload);
+      return {
+        ...state,
+        isLoadingLogin: false,
+        createFailedMessage: action.payload,
+      };
+    case FAILED_CONFIRM:
+      return {
+        ...state,
+        createFailedMessage: '',
+        loginFailedMessage: '',
       };
     case LOGIN_SUCCESS:
       console.log('LOGIN_SUCCESS', action);
@@ -32,6 +48,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         isLoadingLogin: false,
+        loginFailedMessage: 'Login failed',
       };
     case LOGOUT_SUCCESS:
       console.log('LOGOUT_SUCCESS');

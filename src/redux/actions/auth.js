@@ -1,9 +1,11 @@
 import {
   CREATE_USER,
+  CREATE_USER_FAILED,
   LOGIN_SUCCESS,
   LOADING_LOGIN,
   LOGIN_FAILED,
   LOGOUT_SUCCESS,
+  FAILED_CONFIRM,
 } from './actionTypes';
 import * as Google from 'expo-google-app-auth';
 import {
@@ -33,7 +35,7 @@ function loginFailed(err) {
   console.log('loginFailed ---- aciton - auth.js= payload: ', err);
   return {
     type: LOGIN_FAILED,
-    payload: err,
+    payload: err.message,
   };
 }
 
@@ -83,6 +85,20 @@ function createNewUser() {
   };
 }
 
+function failedCreateUser(err) {
+  console.log('failedCreateUser', err);
+  return {
+    type: CREATE_USER_FAILED,
+    payload: err.message,
+  };
+}
+
+export const failedConfirm = () => {
+  return {
+    type: FAILED_CONFIRM,
+  };
+};
+
 export const createUser = (email, password) => {
   console.log('createUser---action.js', email, password);
   return dispatch => {
@@ -94,6 +110,7 @@ export const createUser = (email, password) => {
       })
       .catch(error => {
         console.log('createUser Error: ', error);
+        dispatch(failedCreateUser(error));
       });
   };
 };

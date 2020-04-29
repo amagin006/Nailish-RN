@@ -14,9 +14,15 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
-import { auth } from '../../config/Firebase';
 
-import { userLoginWithPass, googleLogin, createUser } from '../../redux/actions/auth';
+import { RoundButton } from '../../components/button/button';
+import { auth } from '../../config/Firebase';
+import {
+  userLoginWithPass,
+  googleLogin,
+  createUser,
+  failedConfirm,
+} from '../../redux/actions/auth';
 import commonStyles from '../../components/styles/commonStyles';
 
 const Login = props => {
@@ -30,13 +36,26 @@ const Login = props => {
   const [isForgetModalVisible, setIsForgetModalVisible] = useState(false);
   const [isSendSuccess, setIsSendSuccess] = useState(false);
   const [isSendLoading, setIsSendLoading] = useState(false);
+  const [createFailedMessage, setCreateFailedMessage] = useState('');
+  const [loginFailedMessage, setLoginFailedMessage] = useState('');
 
   const dispatch = useDispatch();
   const reduxState = useSelector(state => state);
 
   useEffect(() => {
-    if (reduxState.auth.isLogin) {
+    const { auth } = reduxState;
+    if (auth.isLogin) {
       props.navigation.navigate('CustomerListHome');
+    }
+    if (auth.createFailedMessage) {
+      setCreateFailedMessage(auth.createFailedMessage);
+    } else {
+      setCreateFailedMessage('');
+    }
+    if (auth.loginFailedMessage) {
+      setLoginFailedMessage(auth.loginFailedMessage);
+    } else {
+      setLoginFailedMessage('');
     }
   }, [reduxState.auth]);
 
@@ -66,11 +85,17 @@ const Login = props => {
       await auth.sendPasswordResetEmail(forgetEmail);
       setForgetEmail('');
       setIsSendSuccess(true);
-      setIsSendLoading(false);
     } catch (error) {
       console.log('Error forgetPassword send email: ', error);
       setForgetEmailError(true);
     }
+    setIsSendLoading(false);
+  };
+
+  const _onResetCancel = () => {
+    setIsForgetModalVisible(false);
+    setForgetEmailError(false);
+    setForgetEmail('');
   };
 
   const borderColor =
@@ -84,7 +109,7 @@ const Login = props => {
         </View>
       ) : (
         <>
-          {isForgetModalVisible && (
+          {isForgetModalVisible ? (
             <Modal
               animationType="fade"
               transparent={true}
@@ -102,18 +127,19 @@ const Login = props => {
                         An email has been sent to the address you have provided.{'\n'}Please check
                         your email
                       </Text>
-                      <TouchableOpacity
-                        style={styles.signButton}
+                      <RoundButton
                         onPress={() => {
                           setIsForgetModalVisible(false);
                           setIsSendSuccess(false);
-                        }}>
-                        <Text style={styles.singButtonText}>OK</Text>
-                      </TouchableOpacity>
+                        }}
+                        color={'#96CEB4'}
+                        text={'OK'}
+                        round
+                      />
                     </View>
                   ) : (
                     <>
-                      <Text style={styles.resetPasswordText}>Reset your password</Text>
+                      <Text style={styles.modalTitleText}>Reset your password</Text>
                       <Text style={styles.resetPassDiscText}>
                         Enter the email you use for Nailish, and we&apos;ll help you create a new
                         password.
@@ -137,25 +163,37 @@ const Login = props => {
                         </View>
                       </View>
                       <View style={styles.modalButtonBox}>
-                        <TouchableOpacity style={styles.signButton} onPress={_onResetPassword}>
-                          <Text style={styles.singButtonText}>send</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={[styles.signButton, styles.modalCancelButton]}
-                          onPress={() => {
-                            setIsForgetModalVisible(false);
-                            setForgetEmailError(false);
-                            setForgetEmail('');
-                          }}>
-                          <Text style={styles.singButtonText}>Cancel</Text>
-                        </TouchableOpacity>
+                        <RoundButton onPress={_onResetPassword} color={'#96CEB4'} text={'Send'} />
+                        <RoundButton onPress={_onResetCancel} color={'#ff9999'} text={'Cancel'} />
                       </View>
                     </>
                   )}
                 </View>
               </View>
             </Modal>
-          )}
+          ) : createFailedMessage || loginFailedMessage ? (
+            <Modal
+              animationType="fade"
+              transparent={true}
+              visible={createFailedMessage || loginFailedMessage ? true : false}
+              onRequestClose={() => dispatch(failedConfirm())}>
+              <View style={styles.modalBack}>
+                <View style={[styles.modalInner, { justifyContent: 'space-around' }]}>
+                  <View>
+                    <Text style={styles.createFaliedText}>
+                      {createFailedMessage || loginFailedMessage}
+                    </Text>
+                    <Text style={styles.createFaliedText}>Please try again</Text>
+                  </View>
+                  <RoundButton
+                    onPress={() => dispatch(failedConfirm())}
+                    color={'#96CEB4'}
+                    text={'OK'}
+                  />
+                </View>
+              </View>
+            </Modal>
+          ) : null}
           <Image
             style={styles.logoImage}
             resizeMode={'contain'}
@@ -194,11 +232,7 @@ const Login = props => {
               </TouchableOpacity>
             </View>
             {isSignup ? (
-              <TouchableOpacity
-                style={[styles.signButton, styles.createButton]}
-                onPress={_onCreateUser}>
-                <Text style={styles.singButtonText}>Create Account</Text>
-              </TouchableOpacity>
+              <RoundButton onPress={_onCreateUser} color={'#2482bd'} text={'Create Account'} />
             ) : (
               <>
                 <TouchableOpacity
@@ -206,9 +240,7 @@ const Login = props => {
                   onPress={() => setIsForgetModalVisible(true)}>
                   <Text style={styles.forgetText}>Forget password?</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.signButton} onPress={_onLoginWithEmail}>
-                  <Text style={styles.singButtonText}>Login</Text>
-                </TouchableOpacity>
+                <RoundButton onPress={_onLoginWithEmail} color={'#96CEB4'} text={'Login'} />
               </>
             )}
             <View style={styles.border} />
@@ -348,7 +380,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: '5%',
     borderRadius: 20,
   },
-  resetPasswordText: {
+  modalTitleText: {
     fontSize: 26,
     color: commonStyles.baseTextColor,
     marginVertical: 30,
@@ -366,6 +398,12 @@ const styles = StyleSheet.create({
   modalCancelButton: {
     backgroundColor: '#ff9999',
     marginTop: 20,
+  },
+  createFaliedText: {
+    fontSize: 18,
+    marginBottom: 10,
+    color: commonStyles.baseTextColor,
+    textAlign: 'center',
   },
 });
 
