@@ -2,11 +2,19 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import PropTypes from 'prop-types';
 
+import firebase from './config/Firebase';
+
 const Splash = props => {
   useEffect(() => {
-    setTimeout(() => {
-      props.navigation.navigate('LoginSignup');
-    }, 1000);
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log('user login=================', user);
+        props.navigation.navigate('CustomerListHome');
+      } else {
+        console.log('user logout--------------', user);
+        props.navigation.navigate('LoginSignup');
+      }
+    });
   });
 
   return (

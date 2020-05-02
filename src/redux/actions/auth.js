@@ -16,6 +16,7 @@ import {
 } from 'react-native-dotenv';
 
 import Firebase, { auth } from '../../config/Firebase';
+import { NavigationActions } from 'react-navigation';
 
 function loadingLogIn() {
   console.log('loadingLogIn ---- aciton - auth.js');
@@ -41,6 +42,7 @@ function loginFailed(err) {
 
 function logoutSuccess() {
   console.log('logoutSuccess --- action - auth.js');
+  NavigationActions.navigate('Login');
   return {
     type: LOGOUT_SUCCESS,
   };
@@ -143,7 +145,7 @@ export const googleLogin = () => {
       })
       .catch(error => {
         console.log('Google login - Error: ', error);
-        dispatch(loginFailed());
+        dispatch(loginFailed(error));
       });
   };
 };

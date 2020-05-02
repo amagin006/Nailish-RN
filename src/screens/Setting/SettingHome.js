@@ -1,22 +1,18 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView } from 'react-native';
-import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { userLogout } from '../../redux/actions/auth';
 
-const SettingHome = props => {
+const SettingHome = () => {
   const dispatch = useDispatch();
-  const reduxState = useSelector(state => state);
-
-  useEffect(() => {
-    if (!reduxState.auth?.isLogin) {
-      props.navigation.navigate('Login');
-    }
-  }, [reduxState.auth?.isLogin]);
 
   const _onLogout = () => {
-    dispatch(userLogout());
+    Alert.alert('Are you sure you want to Logout?', '', [
+      { text: 'Cancel' },
+      { text: 'OK', onPress: () => dispatch(userLogout()) },
+    ]);
   };
 
   return (
