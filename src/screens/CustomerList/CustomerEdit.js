@@ -1,9 +1,11 @@
 /* eslint-disable react/display-name */
 import React, { useState, useEffect } from 'react';
-import { View, Image, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { View, Image, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
 import { Foundation } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import PropTypes from 'prop-types';
+import * as Permissions from 'expo-permissions';
+import * as ImagePicker from 'expo-image-picker';
 
 const CustomerEdit = props => {
   const { navigation } = props;
@@ -15,6 +17,7 @@ const CustomerEdit = props => {
   const [twitter, setTwitter] = useState();
   const [birthday, setBirthDay] = useState();
   const [memo, setMemo] = useState();
+  const [imageUrl, setImageUrl] = useState();
 
   useEffect(() => {
     navigation.setParams({ onSavePress: _onSavePress });
@@ -25,7 +28,32 @@ const CustomerEdit = props => {
   };
 
   const _onPressUser = () => {
-    console.log('++++++++');
+    _getPermissionCameraRoll();
+  };
+
+  const _getPermissionCameraRoll = async () => {
+    const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (status !== 'granted') {
+      Alert.alert('Sorry, we need camera roll permissions to make this work!');
+      return;
+    }
+    _pickImage();
+  };
+
+  const _pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.cancelled) {
+        setImageUrl(result.uri);
+      }
+    } catch (err) {
+      console.log('Error getImagePicker: ', err);
+    }
   };
 
   return (
@@ -34,7 +62,9 @@ const CustomerEdit = props => {
         <TouchableOpacity onPress={_onPressUser}>
           <Image
             style={styles.userIconImage}
-            source={require('../../../assets/images/person1.png')}
+            source={
+              imageUrl ? { uri: `${imageUrl}` } : require('../../../assets/images/person1.png')
+            }
           />
           <View style={styles.cameraWrapper}>
             <Foundation style={styles.camera} name={'camera'} />

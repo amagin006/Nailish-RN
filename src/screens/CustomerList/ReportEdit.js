@@ -9,26 +9,25 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  Alert,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import RNPickerSelect from 'react-native-picker-select';
+import * as Permissions from 'expo-permissions';
+import * as ImagePicker from 'expo-image-picker';
+import { FontAwesome } from '@expo/vector-icons';
 
-import Button from '../../components/button/button';
+import { Button } from '../../components/button/button';
 import ReportMenuList from '../../components/reportDetail/reportMenuList';
 import commonStyles from '../../components/styles/commonStyles';
 
 const ReportEdit = ({ navigation }) => {
-  const [mainPhoto, setMainPhoto] = useState(
-    'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/imagePlaceholder.png',
-  );
-  const [selectedPhoto, setSelectedPhoto] = useState(DEFAULTPHOTOS);
+  const [hasPermissionCameraRoll, setHasPermissionCameraRoll] = useState(false);
+  const [reportPhotos, setReportPhotos] = useState(DEFAULTPHOTOS);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [tips, setTips] = useState();
   const [payment, setPayment] = useState();
   const [memo, setMemo] = useState();
-
-  function onPressSubImage(index) {
-    console.log('onPressitem', index);
-  }
 
   const _onPressSelectMenu = () => {
     console.log('onPressSelectMenu');
@@ -46,15 +45,49 @@ const ReportEdit = ({ navigation }) => {
     setMemo(text);
   };
 
+  const _getPermissionCameraRoll = async () => {
+    if (!hasPermissionCameraRoll) {
+      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+      if (status !== 'granted') {
+        Alert.alert('Sorry, we need camera roll permissions to make this work!');
+        return;
+      }
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.cancelled) {
+        let newReportPhotos = [...reportPhotos];
+        newReportPhotos[selectedPhotoIndex].url = result.uri;
+        setReportPhotos(newReportPhotos);
+      }
+    } catch (err) {
+      console.log('Error getImagePicker: ', err);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView>
-        <Image source={{ uri: `${mainPhoto}` }} style={styles.mainPhoto} />
+        <View>
+          <Image
+            source={{ uri: `${reportPhotos[selectedPhotoIndex].url}` }}
+            style={styles.mainPhoto}
+          />
+          <TouchableOpacity onPress={() => _getPermissionCameraRoll()} style={styles.addButton}>
+            <FontAwesome style={styles.addIcon} name={'plus'} />
+          </TouchableOpacity>
+        </View>
         <View style={styles.subImageWrapper}>
-          {selectedPhoto.map((photo, index) => {
+          {reportPhotos.map((photo, index) => {
             return (
               <TouchableOpacity
-                onPress={() => onPressSubImage(index)}
+                onPress={() => setSelectedPhotoIndex(index)}
                 key={`${index}`}
                 style={styles.subImageBox}>
                 <Image source={{ uri: `${photo.url}` }} style={styles.subImage} />
@@ -157,14 +190,19 @@ const styles = StyleSheet.create({
   mainPhoto: {
     width: width,
     height: width,
+    marginBottom: 18,
   },
   subImageWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginHorizontal: '6%',
+    marginHorizontal: '5%',
     marginBottom: 30,
   },
+  subImageBox: {
+    borderRadius: 10,
+  },
   subImage: {
+    borderRadius: 10,
     width: subImageSize,
     height: subImageSize,
     backgroundColor: 'red',
@@ -221,6 +259,22 @@ const styles = StyleSheet.create({
   headerRightText: {
     color: '#fff',
     fontSize: 16,
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 40,
+    right: 30,
+    width: 50,
+    height: 50,
+    paddingTop: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 25,
+    backgroundColor: '#D9534F',
+  },
+  addIcon: {
+    fontSize: 36,
+    color: '#fff',
   },
 });
 

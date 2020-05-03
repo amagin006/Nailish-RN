@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 
-import Button from '../../components/button/button';
+import { Button } from '../../components/button/button';
 import ReportMenuList from '../../components/reportDetail/reportMenuList';
 import commonStyles from '../../components/styles/commonStyles';
 

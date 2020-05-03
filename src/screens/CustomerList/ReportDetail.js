@@ -16,7 +16,7 @@ import commonStyles from '../../components/styles/commonStyles';
 import PagenationDot from '../../components/pagenation/pagenationDot';
 import ReportMenuList from '../../components/reportDetail/reportMenuList';
 import PriceDetail from '../../components/reportDetail/priceDetail';
-import Button from '../../components/button/button';
+import { Button } from '../../components/button/button';
 
 const ReportDetail = ({ navigation }) => {
   const { user, item } = navigation.state.params;

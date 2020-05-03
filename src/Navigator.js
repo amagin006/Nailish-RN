@@ -46,6 +46,7 @@ const CustomerListStack = createStackNavigator(
       headerTitleStyle: {
         fontWeight: 'bold',
       },
+      headerTitleAlign: 'center',
     },
   },
 );
@@ -72,6 +73,7 @@ const CalenderStack = createStackNavigator(
       headerTitleStyle: {
         fontWeight: 'bold',
       },
+      headerTitleAlign: 'center',
     },
   },
 );
@@ -92,6 +94,7 @@ const SettingStack = createStackNavigator(
       headerTitleStyle: {
         fontWeight: 'bold',
       },
+      headerTitleAlign: 'center',
     },
   },
 );
