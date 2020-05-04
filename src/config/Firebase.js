@@ -1,4 +1,7 @@
 import firebase from 'firebase';
+
+import '@firebase/firestore';
+
 import {
   FIREBASE_API_KEY,
   FIREBASE_AUTH_DOMAIN,
@@ -21,7 +24,11 @@ const firebaseConfig = {
   measurementId: FIREBASE_MEASUREMENT_ID,
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const auth = firebase.auth();
 
-export const auth = firebase.auth();
+export const firebaseAuth = auth;
+export const db = firebase.firestore();
 export default firebase;

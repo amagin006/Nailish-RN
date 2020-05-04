@@ -16,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 
 import { RoundButton } from '../../components/button/button';
-import { auth } from '../../config/Firebase';
+import { firebaseAuth } from '../../config/Firebase';
 import {
   userLoginWithPass,
   googleLogin,
@@ -44,9 +44,6 @@ const Login = props => {
 
   useEffect(() => {
     const { auth } = reduxState;
-    if (auth.isLogin) {
-      props.navigation.navigate('CustomerListHome');
-    }
     if (auth.createFailedMessage) {
       setCreateFailedMessage(auth.createFailedMessage);
     } else {
@@ -82,7 +79,7 @@ const Login = props => {
   const _onResetPassword = async () => {
     setIsSendLoading(true);
     try {
-      await auth.sendPasswordResetEmail(forgetEmail);
+      await firebaseAuth.sendPasswordResetEmail(forgetEmail);
       setForgetEmail('');
       setIsSendSuccess(true);
     } catch (error) {
