@@ -23,5 +23,8 @@ module.exports = {
   ],
   "rules": {
     "prettier/prettier": "error",
+  },
+  "globals": {
+    "fetch": false
   }
 }

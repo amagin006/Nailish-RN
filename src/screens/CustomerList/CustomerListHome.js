@@ -69,38 +69,6 @@ const CustomerListHome = ({ navigation }) => {
   );
 };
 
-// try {
-//   const data = await db
-//     .collection('users')
-//     .doc(state.user.uid)
-//     .collection('customer')
-//     .get();
-//   console.log('data', data);
-//   data.forEach(doc => {
-//     console.log(`${doc.id} => ${doc.data()}`);
-//   });
-// } catch (err) {
-//   console.log('Error firebase: ', err);
-// }
-
-// try {
-//   const data = await db
-//     .collection('users')
-//     .doc(`${state.user.uid}`)
-//     .collection('customer')
-//     .add({
-//       firstName: 'hellohello',
-//       lastName: 'ueidj',
-//       born: 7777764372,
-//     });
-//   console.log('data', data);
-//   data.forEach(doc => {
-//     console.log(`${doc.id} => ${doc.data()}`);
-//   });
-// } catch (err) {
-//   console.log('Error firebase: ', err);
-// }
-
 CustomerListHome.navigationOptions = () => ({
   title: 'Customer',
 });

@@ -6,6 +6,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import PropTypes from 'prop-types';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
+import { useSelector } from 'react-redux';
+
+import firebase from '../../config/Firebase';
 
 const CustomerEdit = props => {
   const { navigation } = props;
@@ -18,14 +21,14 @@ const CustomerEdit = props => {
   const [birthday, setBirthDay] = useState();
   const [memo, setMemo] = useState();
   const [imageUrl, setImageUrl] = useState();
+  const [uploadImageUrl, setUploadImageUrl] = useState();
+  const [progress, setProgress] = useState(0);
+
+  const user = useSelector(state => state.user);
 
   useEffect(() => {
     navigation.setParams({ onSavePress: _onSavePress });
   }, []);
-
-  const _onSavePress = () => {
-    console.log('099999999');
-  };
 
   const _onPressUser = () => {
     _getPermissionCameraRoll();
@@ -55,6 +58,79 @@ const CustomerEdit = props => {
       console.log('Error getImagePicker: ', err);
     }
   };
+
+  const _upLoadPhoto = async () => {
+    // import ImageResizer from 'react-native-image-resizer';
+    // todo: it's better to resize before upload image
+    const metadata = {
+      contentType: 'image/jpeg',
+    };
+    const storage = firebase.storage();
+    const imgURI = imageUrl;
+    let blob;
+    try {
+      const response = await fetch(imgURI);
+      blob = await response.blob();
+    } catch (err) {
+      console.log('Error to blob: ', err);
+    }
+    const uploadRef = storage.ref('user').child(`${user.uid}/profile_image`);
+    const uploadTask = uploadRef.put(blob, metadata);
+    uploadTask.on(
+      'state_changed',
+      snapshot => {
+        let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(progress);
+        console.log('progress');
+      },
+      err => {
+        console.log('Error upload: ', err);
+      },
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          setUploadImageUrl(downloadURL);
+          console.log('File available at', downloadURL);
+        });
+      },
+    );
+  };
+
+  const _onSavePress = () => {
+    console.log('099999999');
+    _upLoadPhoto();
+  };
+
+  // try {
+  //   const data = await db
+  //     .collection('users')
+  //     .doc(state.user.uid)
+  //     .collection('customer')
+  //     .get();
+  //   console.log('data', data);
+  //   data.forEach(doc => {
+  //     console.log(`${doc.id} => ${doc.data()}`);
+  //   });
+  // } catch (err) {
+  //   console.log('Error firebase: ', err);
+  // }
+
+  // try {
+  //   const data = await db
+  //     .collection('users')
+  //     .doc(`${state.user.uid}`)
+  //     .collection('customer')
+  //     .add({
+  //       firstName: 'hellohello',
+  //       lastName: 'ueidj',
+  //       born: 7777764372,
+  //     });
+  //   console.log('data', data);
+  //   data.forEach(doc => {
+  //     console.log(`${doc.id} => ${doc.data()}`);
+  //   });
+  // } catch (err) {
+  //   console.log('Error firebase: ', err);
+  // }
 
   return (
     <KeyboardAwareScrollView extraScrollHeight={20} enableOnAndroid={true}>
