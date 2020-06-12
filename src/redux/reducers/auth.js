@@ -15,16 +15,17 @@ const initialState = {
 };
 
 const reducer = (state = initialState, action) => {
+  console.log('auth--reducer: ', action.payload);
   switch (action.type) {
     case CREATE_USER:
-      console.log('CREATE_USER--Reducer', action);
+      // console.log('CREATE_USER--Reducer', action);
       return {
         ...state,
         isLogin: true,
         isLoadingLogin: false,
       };
     case CREATE_USER_FAILED:
-      console.log('CREATE_USER_FAILED', action.payload);
+      // console.log('CREATE_USER_FAILED', action.payload);
       return {
         ...state,
         isLoadingLogin: false,
@@ -37,26 +38,26 @@ const reducer = (state = initialState, action) => {
         loginFailedMessage: '',
       };
     case LOGIN_SUCCESS:
-      console.log('LOGIN_SUCCESS', action);
+      // console.log('LOGIN_SUCCESS', action);
       return {
         ...state,
         isLogin: true,
         isLoadingLogin: false,
       };
     case LOGIN_FAILED:
-      console.log('LOGIN_FAILED', action);
+      // console.log('LOGIN_FAILED', action);
       return {
         ...state,
         isLoadingLogin: false,
         loginFailedMessage: 'Login failed',
       };
     case LOGOUT_SUCCESS:
-      console.log('LOGOUT_SUCCESS');
+      // console.log('LOGOUT_SUCCESS');
       return {
         isLogin: false,
       };
     case LOADING_LOGIN:
-      console.log('LOADING_LOGIN');
+      // console.log('LOADING_LOGIN');
       return {
         ...state,
         isLoadingLogin: true,

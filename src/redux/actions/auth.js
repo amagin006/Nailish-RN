@@ -6,6 +6,7 @@ import {
   LOGIN_FAILED,
   LOGOUT_SUCCESS,
   FAILED_CONFIRM,
+  USER_SET,
 } from './actionTypes';
 import * as Google from 'expo-google-app-auth';
 import {
@@ -15,8 +16,9 @@ import {
   GOOGLE_ANDROID_STANDALONE_CLIENT_ID,
 } from 'react-native-dotenv';
 
-import Firebase, { auth } from '../../config/Firebase';
-import { NavigationActions } from 'react-navigation';
+import store from '../storeConfig';
+import Firebase, { firebaseAuth } from '../../config/Firebase';
+import NavigationService from '../../NavigationService';
 
 function loadingLogIn() {
   console.log('loadingLogIn ---- aciton - auth.js');
@@ -42,7 +44,6 @@ function loginFailed(err) {
 
 function logoutSuccess() {
   console.log('logoutSuccess --- action - auth.js');
-  NavigationActions.navigate('Login');
   return {
     type: LOGOUT_SUCCESS,
   };
@@ -52,7 +53,7 @@ export const userLoginWithPass = (email, password) => {
   console.log('userLogin--action.js', email, password);
   return dispatch => {
     dispatch(loadingLogIn());
-    Firebase.auth()
+    firebaseAuth
       .signInWithEmailAndPassword(email, password)
       .then(() => {
         console.log('login');
@@ -68,7 +69,7 @@ export const userLoginWithPass = (email, password) => {
 export const userLogout = () => {
   console.log('userLogout--action.js');
   return dispatch => {
-    Firebase.auth()
+    firebaseAuth
       .signOut()
       .then(() => {
         console.log('userLogout -- action');
@@ -105,7 +106,7 @@ export const createUser = (email, password) => {
   console.log('createUser---action.js', email, password);
   return dispatch => {
     dispatch(loadingLogIn());
-    Firebase.auth()
+    firebaseAuth
       .createUserWithEmailAndPassword(email, password)
       .then(() => {
         dispatch(createNewUser());
@@ -134,7 +135,7 @@ export const googleLogin = () => {
           const { idToken, accessToken } = result;
           const credential = Firebase.auth.GoogleAuthProvider.credential(idToken, accessToken);
           try {
-            auth.signInWithCredential(credential);
+            firebaseAuth.signInWithCredential(credential);
             dispatch(loginSuccess());
           } catch (err) {
             console.log('Google Auth Error: ', err);
@@ -149,3 +150,15 @@ export const googleLogin = () => {
       });
   };
 };
+
+firebaseAuth.onAuthStateChanged(user => {
+  if (user) {
+    console.log('user login=================', user);
+    NavigationService.navigate('CustomerListHome');
+    store.dispatch({ type: USER_SET, payload: user });
+  } else {
+    console.log('user logout--------------', user);
+    NavigationService.navigate('Login');
+    userLogout();
+  }
+});

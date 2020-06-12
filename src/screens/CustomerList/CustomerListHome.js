@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   SectionList,
   SafeAreaView,
@@ -11,26 +11,68 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+
+import { db } from '../../config/Firebase';
 
 const CustomerListHome = ({ navigation }) => {
+  const [customerList, setCustomerList] = useState([]);
+  const user = useSelector(state => state.user);
+
+  useEffect(() => {
+    async function getCustomerList() {
+      try {
+        let newCustomerList = [];
+        const data = await db
+          .collection('users')
+          .doc(`${user.uid}`)
+          .collection('customer')
+          .orderBy('firstName')
+          .get();
+        data.forEach(doc => {
+          console.log('doc', doc.data());
+          const customer = doc.data();
+
+          if (newCustomerList.length === 0) {
+            newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
+          } else {
+            let findRow;
+            newCustomerList.map(row => {
+              if (row.initial === customer.firstLetter) {
+                row.data.push(customer);
+                findRow = true;
+                return;
+              }
+            });
+            !findRow && newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
+          }
+        });
+        setCustomerList(newCustomerList);
+      } catch (err) {
+        console.log('Error firebase: ', err);
+      }
+    }
+    getCustomerList();
+  }, []);
+
   const _itemSeparator = () => <View style={styles.separator} />;
   const _keyExtractor = item => item.id;
+
+  const _onPressCard = item => {
+    if (navigation.state.params && navigation.state.params.selectClient) {
+      navigation.state.params.selectClient(item);
+      navigation.goBack();
+    } else {
+      navigation.navigate('CustomerReport', item);
+    }
+  };
 
   const _renderItem = ({ item }) => {
     _renderItem.propTypes = { item: PropTypes.object };
 
-    const _onPressCard = item => {
-      if (navigation.state.params && navigation.state.params.selectClient) {
-        navigation.state.params.selectClient(item);
-        navigation.goBack();
-      } else {
-        navigation.navigate('CustomerReport', item);
-      }
-    };
-
     return (
       <TouchableOpacity style={styles.card} onPress={() => _onPressCard(item)}>
-        <Image source={{ uri: `${item.userIcon}` }} style={styles.userIcon} />
+        <Image source={{ uri: `${item.profile}` }} style={styles.userIcon} />
         <View>
           <Text style={styles.name}>{`${item.firstName} ${item.lastName}`}</Text>
           <Text style={styles.lastVisit}>{`${item.lastVisit}`}</Text>
@@ -56,7 +98,7 @@ const CustomerListHome = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.sectionList}>
       <SectionList
-        sections={DATA}
+        sections={customerList}
         keyExtractor={_keyExtractor}
         renderSectionHeader={_renderSectionHeader}
         renderItem={_renderItem}
