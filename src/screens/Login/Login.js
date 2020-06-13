@@ -25,7 +25,7 @@ import {
 } from '../../redux/actions/auth';
 import commonStyles from '../../components/styles/commonStyles';
 
-const Login = props => {
+const Login = () => {
   const [email, setEmail] = useState('');
   const [forgetEmail, setForgetEmail] = useState('');
   const [password, setPassward] = useState('');

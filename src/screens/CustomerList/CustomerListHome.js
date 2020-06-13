@@ -30,8 +30,8 @@ const CustomerListHome = ({ navigation }) => {
           .orderBy('firstName')
           .get();
         data.forEach(doc => {
-          console.log('doc', doc.data());
-          const customer = doc.data();
+          const id = doc.id;
+          const customer = { id, ...doc.data() };
 
           if (newCustomerList.length === 0) {
             newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
@@ -53,7 +53,7 @@ const CustomerListHome = ({ navigation }) => {
       }
     }
     getCustomerList();
-  }, []);
+  }, [user]);
 
   const _itemSeparator = () => <View style={styles.separator} />;
   const _keyExtractor = item => item.id;
@@ -173,94 +173,3 @@ const styles = StyleSheet.create({
 });
 
 export default CustomerListHome;
-
-const DATA = [
-  {
-    initial: 'A',
-    data: [
-      {
-        id: 1,
-        firstName: 'Assuly',
-        lastName: 'Henry',
-        userIcon: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/01.jpg',
-        lastVisit: '2020/01/02',
-        nameInitial: 'A',
-      },
-    ],
-  },
-  {
-    initial: 'B',
-    data: [
-      {
-        id: 2,
-        firstName: 'Bob',
-        lastName: 'Jddkjk',
-        userIcon: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/02.jpg',
-        lastVisit: '2020/01/02',
-        nameInitial: 'B',
-      },
-    ],
-  },
-  {
-    initial: 'C',
-    data: [
-      {
-        id: 3,
-        firstName: 'Cio',
-        lastName: 'YYYdhhdk',
-        userIcon: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/03.jpg',
-        lastVisit: '2020/01/04',
-        birthDay: '2001/02/20',
-        tel: '778-999-0202',
-        nameInitial: 'C',
-      },
-    ],
-  },
-  {
-    initial: 'F',
-    data: [
-      {
-        id: 4,
-        firstName: 'Facn',
-        lastName: 'Udjkd',
-        userIcon: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/04.jpg',
-        lastVisit: '2020/01/04',
-        nameInitial: 'F',
-      },
-    ],
-  },
-  {
-    initial: 'H',
-    data: [
-      {
-        id: 5,
-        firstName: 'Hejkdk',
-        lastName: 'Kdjeijf',
-        userIcon: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/05.jpg',
-        lastVisit: '2020/01/04',
-        nameInitial: 'H',
-      },
-      {
-        id: 6,
-        firstName: 'Huenvf',
-        lastName: 'Wdjkdj',
-        userIcon: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/06.jpg',
-        lastVisit: '2020/01/04',
-        nameInitial: 'H',
-      },
-    ],
-  },
-  {
-    initial: 'T',
-    data: [
-      {
-        id: 7,
-        firstName: 'Tjkdd',
-        lastName: 'Ydhjds',
-        userIcon: 'https://storage.googleapis.com/nailish-firebase.appspot.com/temp/07.jpg',
-        lastVisit: '2020/01/12',
-        nameInitial: 'T',
-      },
-    ],
-  },
-];

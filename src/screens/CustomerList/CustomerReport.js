@@ -17,6 +17,7 @@ import SnsButtons from '../../components/snsButton/snsButtons';
 const CusomerReport = ({ navigation }) => {
   const user = navigation.state.params;
 
+  console.log('user', user);
   const _onAddNewReport = () => {
     console.log('_onAddNewReport');
     navigation.navigate('ReportEdit');
@@ -50,7 +51,7 @@ const CusomerReport = ({ navigation }) => {
     return (
       <View style={styles.customerInfoBox}>
         <View style={styles.customerIconWrapper}>
-          <Image source={{ uri: `${user.userIcon}` }} style={styles.customerIcon} />
+          <Image source={{ uri: `${user.profile}` }} style={styles.customerIcon} />
         </View>
         <Text style={styles.name}>{`${user.firstName} ${user.lastName}`}</Text>
         {user.birthDay && (

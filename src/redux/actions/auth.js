@@ -58,6 +58,7 @@ export const userLoginWithPass = (email, password) => {
       .then(() => {
         console.log('login');
         dispatch(loginSuccess());
+        NavigationService.navigate('CustomerListHome');
       })
       .catch(error => {
         console.log('Error signInWithEmailAndPassword: ', error);
@@ -110,6 +111,7 @@ export const createUser = (email, password) => {
       .createUserWithEmailAndPassword(email, password)
       .then(() => {
         dispatch(createNewUser());
+        NavigationService.navigate('CustomerListHome');
       })
       .catch(error => {
         console.log('createUser Error: ', error);
@@ -137,6 +139,7 @@ export const googleLogin = () => {
           try {
             firebaseAuth.signInWithCredential(credential);
             dispatch(loginSuccess());
+            NavigationService.navigate('CustomerListHome');
           } catch (err) {
             console.log('Google Auth Error: ', err);
           }
