@@ -1,6 +1,16 @@
 /* eslint-disable react/display-name */
 import React, { useState, useEffect } from 'react';
-import { View, Image, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+  Modal,
+} from 'react-native';
 import { Foundation } from '@expo/vector-icons';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import PropTypes from 'prop-types';
@@ -8,27 +18,27 @@ import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
 import { useSelector } from 'react-redux';
 
-import firebase from '../../config/Firebase';
+import firebase, { db } from '../../config/Firebase';
 
 const CustomerEdit = props => {
   const { navigation } = props;
   const [firstName, setFirstName] = useState();
-  const [lastName, setLastName] = useState();
-  const [mobile, setMobile] = useState();
-  const [mail, setMail] = useState();
-  const [instagram, setInstagram] = useState();
-  const [twitter, setTwitter] = useState();
-  const [birthday, setBirthDay] = useState();
-  const [memo, setMemo] = useState();
+  const [lastName, setLastName] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [mail, setMail] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [twitter, setTwitter] = useState('');
+  const [birthday, setBirthDay] = useState('');
+  const [memo, setMemo] = useState('');
   const [imageUrl, setImageUrl] = useState();
-  const [uploadImageUrl, setUploadImageUrl] = useState();
   const [progress, setProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const user = useSelector(state => state.user);
 
   useEffect(() => {
     navigation.setParams({ onSavePress: _onSavePress });
-  }, []);
+  }, [firstName]);
 
   const _onPressUser = () => {
     _getPermissionCameraRoll();
@@ -51,6 +61,7 @@ const CustomerEdit = props => {
         aspect: [4, 3],
         quality: 1,
       });
+      console.log(result.uri);
       if (!result.cancelled) {
         setImageUrl(result.uri);
       }
@@ -59,9 +70,18 @@ const CustomerEdit = props => {
     }
   };
 
+  const _onSavePress = () => {
+    if (!firstName) {
+      Alert.alert('Please enter first Name');
+      return;
+    }
+    _upLoadPhoto();
+  };
+
   const _upLoadPhoto = async () => {
     // import ImageResizer from 'react-native-image-resizer';
     // todo: it's better to resize before upload image
+    setIsLoading(true);
     const metadata = {
       contentType: 'image/jpeg',
     };
@@ -70,6 +90,7 @@ const CustomerEdit = props => {
     let blob;
     try {
       const response = await fetch(imgURI);
+      console.log('responese', response);
       blob = await response.blob();
     } catch (err) {
       console.log('Error to blob: ', err);
@@ -88,42 +109,45 @@ const CustomerEdit = props => {
       },
       () => {
         uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-          setUploadImageUrl(downloadURL);
+          uploadCustomerData(downloadURL);
           console.log('File available at', downloadURL);
         });
       },
     );
   };
 
-  const _onSavePress = () => {
-    console.log('099999999');
-    _upLoadPhoto();
-  };
+  async function uploadCustomerData(downloadURL) {
+    const firstLetter = firstName ? firstName.slice(0, 1) : '#';
+    try {
+      await db
+        .collection('users')
+        .doc(`${user.uid}`)
+        .collection('customer')
+        .add({
+          firstLetter,
+          firstName,
+          lastName,
+          birthday,
+          mobile,
+          mail,
+          instagram,
+          twitter,
+          memo,
+          profileImg: downloadURL,
+        });
+    } catch (err) {
+      console.log('Error firebase: ', err);
+    }
+    props.navigation.pop();
+    setIsLoading(true);
+  }
 
   // try {
-  //   const data = await db
-  //     .collection('users')
-  //     .doc(state.user.uid)
-  //     .collection('customer')
-  //     .get();
-  //   console.log('data', data);
-  //   data.forEach(doc => {
-  //     console.log(`${doc.id} => ${doc.data()}`);
-  //   });
-  // } catch (err) {
-  //   console.log('Error firebase: ', err);
-  // }
-
-  // try {
-  //   const data = await db
-  //     .collection('users')
-  //     .doc(`${state.user.uid}`)
-  //     .collection('customer')
-  //     .add({
-  //       firstName: 'hellohello',
-  //       lastName: 'ueidj',
-  //       born: 7777764372,
-  //     });
+  // const data = await db
+  //   .collection('users')
+  //   .doc(state.user.uid)
+  //   .collection('customer')
+  //   .get();
   //   console.log('data', data);
   //   data.forEach(doc => {
   //     console.log(`${doc.id} => ${doc.data()}`);
@@ -134,6 +158,19 @@ const CustomerEdit = props => {
 
   return (
     <KeyboardAwareScrollView extraScrollHeight={20} enableOnAndroid={true}>
+      {isLoading && (
+        <Modal animationType="fade" transparent={true} visible={isLoading}>
+          <View
+            style={{
+              backgroundColor: 'rgba(0, 0, 0, 0.2)',
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <ActivityIndicator size={'large'} color={'#'} />
+          </View>
+        </Modal>
+      )}
       <View style={styles.userIconHeader}>
         <TouchableOpacity onPress={_onPressUser}>
           <Image

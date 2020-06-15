@@ -1,5 +1,7 @@
 export default {
   baseTextColor: '#636363',
+  // fontFamily: 'sans-serif',
+  // fontBold: 'sans-serif',
   bodyWrapper: {
     marginHorizontal: '8%',
   },

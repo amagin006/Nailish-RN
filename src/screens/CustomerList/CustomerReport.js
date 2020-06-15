@@ -51,7 +51,7 @@ const CusomerReport = ({ navigation }) => {
     return (
       <View style={styles.customerInfoBox}>
         <View style={styles.customerIconWrapper}>
-          <Image source={{ uri: `${user.profile}` }} style={styles.customerIcon} />
+          <Image source={{ uri: `${user.profileImg}` }} style={styles.customerIcon} />
         </View>
         <Text style={styles.name}>{`${user.firstName} ${user.lastName}`}</Text>
         {user.birthDay && (

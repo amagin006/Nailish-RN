@@ -8,6 +8,8 @@ import {
   Image,
   Text,
   StyleSheet,
+  ScrollView,
+  RefreshControl,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
@@ -17,44 +19,47 @@ import { db } from '../../config/Firebase';
 
 const CustomerListHome = ({ navigation }) => {
   const [customerList, setCustomerList] = useState([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const user = useSelector(state => state.user);
 
   useEffect(() => {
-    async function getCustomerList() {
-      try {
-        let newCustomerList = [];
-        const data = await db
-          .collection('users')
-          .doc(`${user.uid}`)
-          .collection('customer')
-          .orderBy('firstName')
-          .get();
-        data.forEach(doc => {
-          const id = doc.id;
-          const customer = { id, ...doc.data() };
-
-          if (newCustomerList.length === 0) {
-            newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
-          } else {
-            let findRow;
-            newCustomerList.map(row => {
-              if (row.initial === customer.firstLetter) {
-                row.data.push(customer);
-                findRow = true;
-                return;
-              }
-            });
-            !findRow && newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
-          }
-        });
-        setCustomerList(newCustomerList);
-      } catch (err) {
-        console.log('Error firebase: ', err);
-      }
-    }
     getCustomerList();
   }, [user]);
 
+  // TODO: move to Redux
+  async function getCustomerList() {
+    try {
+      let newCustomerList = [];
+      const data = await db
+        .collection('users')
+        .doc(`${user.uid}`)
+        .collection('customer')
+        .orderBy('firstName')
+        .get();
+      data.forEach(doc => {
+        const id = doc.id;
+        const customer = { id, ...doc.data() };
+
+        if (newCustomerList.length === 0) {
+          newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
+        } else {
+          let findRow;
+          newCustomerList.map(row => {
+            if (row.initial === customer.firstLetter) {
+              row.data.push(customer);
+              findRow = true;
+              return;
+            }
+          });
+          !findRow && newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
+        }
+      });
+      setCustomerList(newCustomerList);
+    } catch (err) {
+      console.log('Error firebase: ', err);
+    }
+  }
   const _itemSeparator = () => <View style={styles.separator} />;
   const _keyExtractor = item => item.id;
 
@@ -72,7 +77,7 @@ const CustomerListHome = ({ navigation }) => {
 
     return (
       <TouchableOpacity style={styles.card} onPress={() => _onPressCard(item)}>
-        <Image source={{ uri: `${item.profile}` }} style={styles.userIcon} />
+        <Image source={{ uri: `${item.profileImg}` }} style={styles.userIcon} />
         <View>
           <Text style={styles.name}>{`${item.firstName} ${item.lastName}`}</Text>
           <Text style={styles.lastVisit}>{`${item.lastVisit}`}</Text>
@@ -95,15 +100,41 @@ const CustomerListHome = ({ navigation }) => {
     navigation.navigate('CustomerEdit');
   };
 
+  const _onRefresh = async () => {
+    setIsRefreshing(true);
+    await getCustomerList();
+    setIsRefreshing(false);
+  };
+
   return (
     <SafeAreaView style={styles.sectionList}>
-      <SectionList
-        sections={customerList}
-        keyExtractor={_keyExtractor}
-        renderSectionHeader={_renderSectionHeader}
-        renderItem={_renderItem}
-        ItemSeparatorComponent={_itemSeparator}
-      />
+      {customerList.length > 0 ? (
+        <SectionList
+          sections={customerList}
+          keyExtractor={_keyExtractor}
+          renderSectionHeader={_renderSectionHeader}
+          renderItem={_renderItem}
+          ItemSeparatorComponent={_itemSeparator}
+          refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={_onRefresh} />}
+        />
+      ) : (
+        <ScrollView
+          contentContainerStyle={{ flex: 1 }}
+          refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={_onRefresh} />}>
+          <View style={styles.noListWrap}>
+            <View style={styles.noListImagebox}>
+              <Image
+                source={require('../../../assets/images/cat_1.png')}
+                style={styles.noListImage}
+              />
+            </View>
+            <Text style={styles.noListTextBold}>There is no customer yet.</Text>
+            <Text style={styles.noListText}>
+              Please tap &quot;+&quot; button below to add your customer
+            </Text>
+          </View>
+        </ScrollView>
+      )}
       <TouchableOpacity style={styles.addButton} onPress={_onAddButton}>
         <FontAwesome style={styles.addIcon} name={'plus'} />
       </TouchableOpacity>
@@ -169,6 +200,35 @@ const styles = StyleSheet.create({
   addIcon: {
     fontSize: 36,
     color: '#fff',
+  },
+  noListWrap: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: '10%',
+  },
+  noListImagebox: {
+    width: 200,
+    height: 200,
+    marginTop: -200,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noListImage: {
+    width: '70%',
+    resizeMode: 'contain',
+    tintColor: '#dbdbdb',
+  },
+  noListTextBold: {
+    fontSize: 20,
+    textAlign: 'center',
+    color: '#b0b0b0',
+    marginBottom: 18,
+  },
+  noListText: {
+    fontSize: 15,
+    color: '#b0b0b0',
+    textAlign: 'center',
   },
 });
 
