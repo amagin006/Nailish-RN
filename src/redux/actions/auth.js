@@ -139,7 +139,6 @@ export const googleLogin = () => {
           try {
             firebaseAuth.signInWithCredential(credential);
             dispatch(loginSuccess());
-            NavigationService.navigate('CustomerListHome');
           } catch (err) {
             console.log('Google Auth Error: ', err);
           }

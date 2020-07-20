@@ -57,7 +57,7 @@ const CustomerListHome = ({ navigation }) => {
       });
       setCustomerList(newCustomerList);
     } catch (err) {
-      console.log('Error firebase: ', err);
+      console.log('Error get customerList: ', err);
     }
   }
   const _itemSeparator = () => <View style={styles.separator} />;
