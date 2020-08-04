@@ -21,7 +21,7 @@ import { Button } from '../../components/button/button';
 import ReportMenuList from '../../components/reportDetail/reportMenuList';
 import commonStyles from '../../components/styles/commonStyles';
 
-const ReportEdit = ({ navigation }) => {
+const ReportEdit = () => {
   const [hasPermissionCameraRoll, setHasPermissionCameraRoll] = useState(false);
   const [reportPhotos, setReportPhotos] = useState(DEFAULTPHOTOS);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
@@ -79,7 +79,7 @@ const ReportEdit = ({ navigation }) => {
             source={{ uri: `${reportPhotos[selectedPhotoIndex].url}` }}
             style={styles.mainPhoto}
           />
-          <TouchableOpacity onPress={() => _getPermissionCameraRoll()} style={styles.addButton}>
+          <TouchableOpacity onPress={_getPermissionCameraRoll} style={styles.addButton}>
             <FontAwesome style={styles.addIcon} name={'plus'} />
           </TouchableOpacity>
         </View>
@@ -152,8 +152,10 @@ ReportEdit.navigationOptions = {
   title: 'Edit Report',
   headerRight: function headerRight() {
     return (
-      <TouchableOpacity style={styles.headerRight} onPress={() => console.log('onPress Saved')}>
-        <Text style={styles.headerRightText}>Save</Text>
+      <TouchableOpacity
+        style={commonStyles.headerRight}
+        onPress={() => console.log('onPress Saved')}>
+        <Text style={commonStyles.headerRightText}>Save</Text>
       </TouchableOpacity>
     );
   },
@@ -251,14 +253,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     height: 200,
     paddingHorizontal: 10,
-  },
-  headerRight: {
-    padding: 10,
-    marginRight: 10,
-  },
-  headerRightText: {
-    color: '#fff',
-    fontSize: 16,
   },
   addButton: {
     position: 'absolute',

@@ -16,8 +16,10 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import PropTypes from 'prop-types';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
+import { Button } from '../../components/button/button';
+import { customerLoad } from '../../redux/actions/customer';
 import firebase, { db } from '../../config/Firebase';
 
 const CustomerEdit = props => {
@@ -33,8 +35,26 @@ const CustomerEdit = props => {
   const [imageUrl, setImageUrl] = useState();
   const [progress, setProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [customer, setCustomer] = useState();
 
   const user = useSelector(state => state.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const customer = props.navigation.getParam('item');
+    if (customer) {
+      setFirstName(customer.firstName);
+      setLastName(customer.lastName);
+      setMobile(customer.mobile);
+      setMail(customer.mail);
+      setInstagram(customer.instagram);
+      setTwitter(customer.twitter);
+      setBirthDay(customer.birthday);
+      setMemo(customer.memo);
+      setImageUrl(customer.profileImg);
+      setCustomer(customer);
+    }
+  }, []);
 
   useEffect(() => {
     navigation.setParams({ onSavePress: _onSavePress });
@@ -75,10 +95,35 @@ const CustomerEdit = props => {
       Alert.alert('Please enter first Name');
       return;
     }
-    _upLoadPhoto();
+    // _upLoadPhoto();
+    uploadCustomerData();
   };
 
-  const _upLoadPhoto = async () => {
+  const _onDelete = () => {
+    Alert.alert('Are you sure you want to delete this customer?', '', [
+      { text: 'Cancel' },
+      { text: 'OK', onPress: _deleteCustomer },
+    ]);
+  };
+
+  const _deleteCustomer = async () => {
+    console.log('user.uid', user.uid);
+    console.log('customerId', customer.id);
+    try {
+      await db
+        .collection('users')
+        .doc(`${user.uid}`)
+        .collection('customer')
+        .doc(`${customer.id}`)
+        .delete();
+      console.log('Document successfully deleted! customerId', customer.id);
+      navigation.popToTop();
+    } catch (err) {
+      console.log('Error delete customer: ', err);
+    }
+  };
+
+  const _upLoadPhoto = async customerId => {
     // import ImageResizer from 'react-native-image-resizer';
     // todo: it's better to resize before upload image
     setIsLoading(true);
@@ -95,7 +140,7 @@ const CustomerEdit = props => {
     } catch (err) {
       console.log('Error to blob: ', err);
     }
-    const uploadRef = storage.ref('user').child(`${user.uid}/profile_image`);
+    const uploadRef = storage.ref('user').child(`${user.uid}/customers/${customerId}/profile_img`);
     const uploadTask = uploadRef.put(blob, metadata);
     uploadTask.on(
       'state_changed',
@@ -109,52 +154,66 @@ const CustomerEdit = props => {
       },
       () => {
         uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-          uploadCustomerData(downloadURL);
+          // uploadCustomerData(downloadURL);
           console.log('File available at', downloadURL);
+          return downloadURL;
         });
       },
     );
   };
 
-  async function uploadCustomerData(downloadURL) {
+  async function uploadCustomerData() {
     const firstLetter = firstName ? firstName.slice(0, 1) : '#';
-    try {
-      await db
-        .collection('users')
-        .doc(`${user.uid}`)
-        .collection('customer')
-        .add({
-          firstLetter,
-          firstName,
-          lastName,
-          birthday,
-          mobile,
-          mail,
-          instagram,
-          twitter,
-          memo,
-          profileImg: downloadURL,
-        });
-    } catch (err) {
-      console.log('Error firebase: ', err);
+    let updateCustomer = {
+      firstLetter,
+      firstName,
+      lastName,
+      birthday,
+      mobile,
+      mail,
+      instagram,
+      twitter,
+      memo,
+      profileImg: imageUrl,
+    };
+
+    let res;
+    // new customer
+    if (!customer) {
+      try {
+        res = await db
+          .collection('users')
+          .doc(`${user.uid}`)
+          .collection('customer')
+          .add(updateCustomer);
+        console.log('res.id', res.id);
+      } catch (err) {
+        console.log('Error firebase: ', err);
+      }
+      updateCustomer.profileImg = await _upLoadPhoto(res.id);
     }
+
+    if (imageUrl && !imageUrl.indexOf('https://')) {
+      console.log('not imageURL https://');
+      updateCustomer.profileImg = await _upLoadPhoto(customer?.id);
+    }
+
+    // It doesn't wait  => I have to figure out way to update after upload image
+    const customerRef = db
+      .collection('users')
+      .doc(`${user.uid}`)
+      .collection('customer')
+      .doc(`${res.id}`);
+    try {
+      await customerRef.update(updateCustomer);
+    } catch (err) {
+      console.log('Error update image', err);
+    }
+
+    dispatch(customerLoad(true));
     props.navigation.pop();
     setIsLoading(true);
   }
-
-  // try {
-  // const data = await db
-  //   .collection('users')
-  //   .doc(state.user.uid)
-  //   .collection('customer')
-  //   .get();
-  //   console.log('data', data);
-  //   data.forEach(doc => {
-  //     console.log(`${doc.id} => ${doc.data()}`);
-  //   });
-  // } catch (err) {
-  //   console.log('Error firebase: ', err);
-  // }
 
   return (
     <KeyboardAwareScrollView extraScrollHeight={20} enableOnAndroid={true}>
@@ -285,6 +344,11 @@ const CustomerEdit = props => {
           placeholder="something..."
         />
       </View>
+      {customer && (
+        <View style={styles.deleteButton}>
+          <Button onPress={_onDelete} text={'Delete customer'} color={'red'} />
+        </View>
+      )}
     </KeyboardAwareScrollView>
   );
 };
@@ -344,8 +408,8 @@ const styles = StyleSheet.create({
   },
   column: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
     paddingVertical: 16,
+    borderBottomWidth: 1,
     borderBottomColor: '#E2E8ED',
   },
   columnLeft: {
@@ -374,6 +438,14 @@ const styles = StyleSheet.create({
   memoTextInput: {
     flex: 1,
     marginTop: 10,
+  },
+  deleteButton: {
+    width: '80%',
+    alignSelf: 'center',
+    marginVertical: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8ED',
   },
 });
 

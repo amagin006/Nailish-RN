@@ -7,4 +7,6 @@ export const LOGIN_FAILED = 'LOGIN_FAILED';
 export const LOGOUT_SUCCESS = 'LOGOUT_SUCCESS';
 export const USER_SET = 'USER_SET';
 
+export const CUSTOMERLIST_LOADING = 'CUSTOMERLIST_LOADING';
+
 export const FAILED_CONFIRM = 'FAILED_CONFIRM';

@@ -23,4 +23,12 @@ export default {
     width: 80,
     textAlign: 'right',
   },
+  headerRight: {
+    padding: 10,
+    marginRight: 10,
+  },
+  headerRightText: {
+    color: '#fff',
+    fontSize: 16,
+  },
 };

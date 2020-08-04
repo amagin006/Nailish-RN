@@ -8,7 +8,7 @@ import { Foundation, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import Splash from './Splash';
 import CustomerListHome from './screens/CustomerList/CustomerListHome';
-import CustomerReport from './screens/CustomerList/CustomerReport';
+import ReportList from './screens/CustomerList/ReportList';
 import CustomerEdit from './screens/CustomerList/CustomerEdit';
 import ReportDetail from './screens/CustomerList/ReportDetail';
 import ReportEdit from './screens/CustomerList/ReportEdit';
@@ -22,8 +22,8 @@ const CustomerListStack = createStackNavigator(
     CustomerListHome: {
       screen: CustomerListHome,
     },
-    CustomerReport: {
-      screen: CustomerReport,
+    ReportList: {
+      screen: ReportList,
     },
     CustomerEdit: {
       screen: CustomerEdit,

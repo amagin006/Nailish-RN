@@ -13,8 +13,9 @@ import {
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
+import { customerLoad } from '../../redux/actions/customer';
 import { db } from '../../config/Firebase';
 
 const CustomerListHome = ({ navigation }) => {
@@ -22,59 +23,65 @@ const CustomerListHome = ({ navigation }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const user = useSelector(state => state.user);
+  const customer = useSelector(state => state.customer);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    getCustomerList();
-  }, [user]);
+    async function getCustomerList() {
+      try {
+        let newCustomerList = [];
+        const data = await db
+          .collection('users')
+          .doc(`${user.uid}`)
+          .collection('customer')
+          .orderBy('firstName')
+          .get();
+        data.forEach(doc => {
+          const id = doc.id;
+          const customer = { id, ...doc.data() };
 
-  // TODO: move to Redux
-  async function getCustomerList() {
-    try {
-      let newCustomerList = [];
-      const data = await db
-        .collection('users')
-        .doc(`${user.uid}`)
-        .collection('customer')
-        .orderBy('firstName')
-        .get();
-      data.forEach(doc => {
-        const id = doc.id;
-        const customer = { id, ...doc.data() };
-
-        if (newCustomerList.length === 0) {
-          newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
-        } else {
-          let findRow;
-          newCustomerList.map(row => {
-            if (row.initial === customer.firstLetter) {
-              row.data.push(customer);
-              findRow = true;
-              return;
-            }
-          });
-          !findRow && newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
-        }
-      });
-      setCustomerList(newCustomerList);
-    } catch (err) {
-      console.log('Error get customerList: ', err);
+          if (newCustomerList.length === 0) {
+            newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
+          } else {
+            let findRow;
+            newCustomerList.map(row => {
+              if (row.initial === customer.firstLetter) {
+                row.data.push(customer);
+                findRow = true;
+                return;
+              }
+            });
+            !findRow && newCustomerList.push({ initial: customer.firstLetter, data: [customer] });
+          }
+        });
+        console.log('newCustomerLIst', newCustomerList);
+        setCustomerList(newCustomerList);
+        setIsRefreshing(false);
+      } catch (err) {
+        console.log('Error firebase: ', err);
+      }
     }
-  }
+    getCustomerList();
+    // dispatch(customerLoad(false));
+    // }, [user, customer.isFetching]);
+  }, [user, isRefreshing]);
+
   const _itemSeparator = () => <View style={styles.separator} />;
   const _keyExtractor = item => item.id;
 
   const _onPressCard = item => {
-    if (navigation.state.params && navigation.state.params.selectClient) {
-      navigation.state.params.selectClient(item);
-      navigation.goBack();
-    } else {
-      navigation.navigate('CustomerReport', item);
-    }
+    navigation.navigate('ReportList', item);
+    // if (navigation.state.params && navigation.state.params.selectClient) {
+    //   navigation.state.params.selectClient(item);
+    //   navigation.goBack();
+    // } else {
+    //   navigation.navigate('ReportList', item);
+    // }
   };
 
   const _renderItem = ({ item }) => {
     _renderItem.propTypes = { item: PropTypes.object };
-
+    console.log('-------------------', item.profileImg);
     return (
       <TouchableOpacity style={styles.card} onPress={() => _onPressCard(item)}>
         <Image source={{ uri: `${item.profileImg}` }} style={styles.userIcon} />
@@ -102,8 +109,6 @@ const CustomerListHome = ({ navigation }) => {
 
   const _onRefresh = async () => {
     setIsRefreshing(true);
-    await getCustomerList();
-    setIsRefreshing(false);
   };
 
   return (

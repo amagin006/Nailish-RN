@@ -12,15 +12,30 @@ import moment from 'moment';
 import { FontAwesome } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 
+import commonStyle from '../../components/styles/commonStyles';
 import SnsButtons from '../../components/snsButton/snsButtons';
 
-const CusomerReport = ({ navigation }) => {
-  const user = navigation.state.params;
+const ReportList = ({ navigation }) => {
+  ReportList.navigationOptions = {
+    title: 'Edit Report',
+    headerRight: function headerRight() {
+      return (
+        <TouchableOpacity style={commonStyle.headerRight} onPress={_onEdit}>
+          <Text style={commonStyle.headerRightText}>Edit</Text>
+        </TouchableOpacity>
+      );
+    },
+  };
 
-  console.log('user', user);
+  const customer = navigation.state.params;
+
   const _onAddNewReport = () => {
     console.log('_onAddNewReport');
     navigation.navigate('ReportEdit');
+  };
+
+  const _onEdit = () => {
+    navigation.navigate('CustomerEdit', { item: customer });
   };
 
   const _keyExtractor = item => item.id;
@@ -51,17 +66,17 @@ const CusomerReport = ({ navigation }) => {
     return (
       <View style={styles.customerInfoBox}>
         <View style={styles.customerIconWrapper}>
-          <Image source={{ uri: `${user.profileImg}` }} style={styles.customerIcon} />
+          <Image source={{ uri: `${customer.profileImg}` }} style={styles.customerIcon} />
         </View>
-        <Text style={styles.name}>{`${user.firstName} ${user.lastName}`}</Text>
-        {user.birthDay && (
+        <Text style={styles.name}>{`${customer.firstName} ${customer.lastName}`}</Text>
+        {customer.birthDay && (
           <View style={styles.birthDayWrapper}>
             <FontAwesome name={'birthday-cake'} style={styles.birthDayIcon} />
-            <Text style={styles.birthDay}>{user.birthDay}</Text>
+            <Text style={styles.birthDay}>{customer.birthDay}</Text>
           </View>
         )}
         <View style={styles.snsCenterBox}>
-          <SnsButtons user={user} />
+          <SnsButtons user={customer} />
         </View>
         <TouchableOpacity style={styles.newReportButton} onPress={_onAddNewReport}>
           <FontAwesome name={'file-text-o'} style={styles.newReportIcon} />
@@ -72,7 +87,7 @@ const CusomerReport = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
       <FlatList
         data={FAKE_DATA.report}
         keyExtractor={_keyExtractor}
@@ -84,7 +99,7 @@ const CusomerReport = ({ navigation }) => {
   );
 };
 
-CusomerReport.propTypes = { navigation: PropTypes.object };
+ReportList.propTypes = { navigation: PropTypes.object };
 
 const styles = StyleSheet.create({
   customerInfoBox: {
@@ -181,7 +196,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CusomerReport;
+export default ReportList;
+
 const FAKE_DATA = {
   user: {
     id: 1,

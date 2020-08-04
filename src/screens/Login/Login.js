@@ -25,7 +25,7 @@ import {
 } from '../../redux/actions/auth';
 import commonStyles from '../../components/styles/commonStyles';
 
-const Login = () => {
+const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [forgetEmail, setForgetEmail] = useState('');
   const [password, setPassward] = useState('');
@@ -155,6 +155,7 @@ const Login = () => {
                               onChangeText={text => setForgetEmail(text)}
                               placeholder={'Enter your email'}
                               onFocus={() => setForgetEmailError(false)}
+                              autoCapitalize={'none'}
                             />
                           </View>
                         </View>
@@ -209,6 +210,7 @@ const Login = () => {
                 onChangeText={text => setEmail(text)}
                 placeholder={'Enter your email'}
                 onFocus={() => setEmaiPassError(false)}
+                autoCapitalize={'none'}
               />
             </View>
             <View style={[styles.inputTextBox, borderColor]}>
@@ -219,6 +221,7 @@ const Login = () => {
                 placeholder={'Enter your password'}
                 onFocus={() => setEmaiPassError(false)}
                 secureTextEntry={isPasswordInVisible}
+                autoCapitalize={'none'}
               />
               <TouchableOpacity onPress={() => setIsPasswordInVisible(!isPasswordInVisible)}>
                 <Ionicons
