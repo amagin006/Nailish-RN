@@ -9,7 +9,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <Navigator
-        ref={navigatorRef => {
+        ref={(navigatorRef: any) => {
           NavigationService.setTopLevelNavigator(navigatorRef);
         }}
       />
